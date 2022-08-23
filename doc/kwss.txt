@@ -1,0 +1,45 @@
+Entity:
+  CommonProperty:
+    HP:
+      * hitpoints; lose em all and ur ded
+    Stamina:
+      * abilities cost Stamina per turn active
+
+  Soldier:
+    Interaction:
+      Soldier:
+        * Attack/Defend normally -> remove/lose HP (hitpoints)
+        * Defend with Overwatch -> lose reduced amount of HP
+      Spy:
+        * Attack while Cloak is active -> Spy wins
+        * Defend while Cloak is active -> Spy wins
+        * Attack normally -> Soldier wins
+        * Defend normally/with Overwatch -> Soldier wins
+    Ability:
+      Overwatch:
+        * toggled on/off ability (activate by standing still)
+        * cannot move or attack while active
+        * reveals adjacent Cloak(ed) spies
+        * trigger an attack against adjacent (uncloaked) enemies that does overwatch_dmg damage
+          (i.e. enemies moving into an adjacent tile while a Soldier is standing still)
+        Cost:
+          * each turn with Overwatch active costs overwatch_cost Stamina
+
+  Spy:
+    Interaction:
+      Soldier:
+        * Attack while Cloak is active -> Spy wins
+        * Defend while Cloak is active -> Spy wins
+        * Attack normally -> Soldier wins
+        * Defend normally -> Soldier wins
+      Spy:
+        * Attack while Cloak is active -> other Spy turns to this Spy's side
+        * Defend while Cloak is active -> Stalemate
+        * Attack normally -> turn_p probability to turn other Spy
+        * Defend normally -> 1 - turn_p probability to turn other Spy
+    Ability:
+      Cloak:
+        * other Entity(s) cannot see (pathfind to) spy
+        * attacking from Cloak instantly kills Soldiers
+        Cost:
+          * each turn with Cloak active costs cloak_cost Stamina
