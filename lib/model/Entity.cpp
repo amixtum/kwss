@@ -1,61 +1,99 @@
 #include "../../include/model/Entity.h"
 
-
-Entity::Entity(EntityType type, int hp, int stamina)
+Entity::Entity(EntityType type, Team team, int hp, int stamina)
 {
   _type = type;
+  _team = team;
   _hp = hp;
   _stamina = stamina;
+  _state = AbilityState::Off;
 }
 
-
-EntityType Entity::type()
+EntityType
+Entity::type()
 {
   return _type;
 }
 
-int Entity::hp()
+Team
+Entity::team()
+{
+  return _team;
+}
+
+int
+Entity::hp()
 {
   return _hp;
 }
 
-int Entity::stamina()
+int
+Entity::stamina()
 {
   return _stamina;
 }
 
-bool Entity::ability_active()
+AbilityState
+Entity::state()
 {
-  return _ability_toggle;
+  return _state;
 }
 
+bool
+Entity::alive()
+{
+  return hp() > 0;
+}
 
-void Entity::set_hp(int hp)
+bool
+Entity::has_stamina()
+{
+  return stamina() > 0;
+}
+
+void
+Entity::set_team(Team team)
+{
+  _team = team;
+}
+
+void
+Entity::set_hp(int hp)
 {
   _hp = hp;
 }
 
-void Entity::set_stamina(int stamina)
+void
+Entity::set_stamina(int stamina)
 {
   _stamina = stamina;
 }
 
-void Entity::add_hp(int hp)
+void
+Entity::add_hp(int hp)
 {
   _hp += hp;
 }
 
-void Entity::add_stamina(int stamina)
+void
+Entity::add_stamina(int stamina)
 {
   _stamina += stamina;
 }
 
-void Entity::set_ability(bool on)
+void
+Entity::set_ability_state(AbilityState state)
 {
-  _ability_toggle = on;
+  _state = state;
 }
 
-void Entity::toggle_ability() 
+// only use if ability is toggleable
+void
+Entity::toggle_ability_state()
 {
-  _ability_toggle = !_ability_toggle;
+  if (_state == AbilityState::On) {
+    _state = AbilityState::Off;
+  } else if (_state == AbilityState::Off) {
+    _state = AbilityState::On;
+  }
 }

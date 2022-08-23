@@ -1,7 +1,8 @@
 #ifndef POINT2I_H_
 #define POINT2I_H_
 
-class Point2i {
+class Point2i
+{
 public:
   Point2i(int x, int y);
 

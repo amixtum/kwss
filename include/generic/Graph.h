@@ -103,8 +103,8 @@ Graph<VertexType>::remove_vertex(const VertexType& v)
 template<class VertexType>
 void
 Graph<VertexType>::add_edge(const VertexType& from,
-                           const VertexType& to,
-                           int weight)
+                            const VertexType& to,
+                            int weight)
 {
   auto findTo = _map[from].find(to);
   if (findTo != _map[from].end()) {
@@ -224,9 +224,8 @@ Graph<VertexType>::contract_rand_edge_no_parallel()
     if (it != _map[src_vertex.first].end()) {
       if (_map[src_vertex.first].find(edge.first) !=
           _map[src_vertex.first].end()) {
-        addNewEdge(src_vertex.first,
-                   edge.first,
-                   weight(src_vertex.first, edge.second));
+        addNewEdge(
+          src_vertex.first, edge.first, weight(src_vertex.first, edge.second));
       }
 
       remove_edge(src_vertex.first, edge.second);
@@ -242,8 +241,7 @@ Graph<VertexType>::contract_edge_no_parallel(
   const std::pair<VertexType, VertexType> edge)
 {
   for (auto& destVertex : _map[edge.second]) {
-    if (_map[edge.first].find(destVertex.first) ==
-        _map[edge.first].end()) {
+    if (_map[edge.first].find(destVertex.first) == _map[edge.first].end()) {
       addNewEdge(edge.first,
                  destVertex.first,
                  weight(edge.first, edge.second) +
@@ -258,9 +256,8 @@ Graph<VertexType>::contract_edge_no_parallel(
     if (it != _map[src_vertex.first].end()) {
       if (_map[src_vertex.first].find(edge.first) !=
           _map[src_vertex.first].end()) {
-        addNewEdge(src_vertex.first,
-                   edge.first,
-                   weight(src_vertex.first, edge.second));
+        addNewEdge(
+          src_vertex.first, edge.first, weight(src_vertex.first, edge.second));
       }
 
       remove_edge(src_vertex.first, edge.second);

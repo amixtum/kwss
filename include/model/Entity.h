@@ -3,22 +3,30 @@
 
 #include <memory>
 
+#include "AbilityState.h"
 #include "EntityType.h"
+#include "Team.h"
 
-class Entity 
+class Entity
 {
 public:
-  Entity(EntityType type, int hp, int stamina);
-
+  Entity(EntityType type, Team team, int hp, int stamina);
 
   EntityType type();
+
+  Team team();
 
   int hp();
 
   int stamina();
 
-  bool ability_active();
+  AbilityState state();
 
+  bool alive();
+
+  bool has_stamina();
+
+  void set_team(Team team);
 
   void set_hp(int hp);
 
@@ -28,17 +36,18 @@ public:
 
   void add_stamina(int stamina);
 
-  void set_ability(bool on);
+  void set_ability_state(AbilityState state);
 
-  void toggle_ability();
+  void toggle_ability_state();
 
 private:
+  Team _team;
   EntityType _type;
 
   int _hp;
   int _stamina;
 
-  bool _ability_toggle;
+  AbilityState _state;
 };
 
 #endif // Entity.h included

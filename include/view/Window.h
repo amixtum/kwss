@@ -7,27 +7,25 @@
 
 #include "../model/Point2i.h"
 
-class Window {
+class Window
+{
 public:
   Window(int height, int width, int tl_y, int tl_x);
 
   Window(Point2i dimensions, Point2i top_left);
 
   ~Window();
-   
 
-  WINDOW * ptr();
-
+  WINDOW* ptr();
 
   Point2i size();
 
-
   // call this to draw all changes to the window
   void refresh();
-  
+
   // add char with attributes
-  // 
-  
+  //
+
   void add_char_at(Point2i at, unsigned char c);
 
   // default window border
@@ -37,7 +35,7 @@ public:
   void remove_border();
 
 private:
-  WINDOW *_win;
+  WINDOW* _win;
 };
 
-#endif 
+#endif

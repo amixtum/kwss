@@ -71,7 +71,7 @@ public:
 
   static int Rank(Node root, K key);
 
-  static void Inorder(Node root, std::vector<Node> &nodes);
+  static void Inorder(Node root, std::vector<Node>& nodes);
 
   static Node InsertNode(Node root, K key, V value);
 
@@ -93,7 +93,6 @@ private:
   static void _DecrementSize(Node to_delete);
 
   static void _IncrementSize(Node toAdd);
-
 };
 
 template<class K, class V>
@@ -599,7 +598,7 @@ BinarySearchTree<K, V>::Rank(Node root, K key)
 
 template<class K, class V>
 void
-BinarySearchTree<K, V>::Inorder(Node root, std::vector<Node> &nodes)
+BinarySearchTree<K, V>::Inorder(Node root, std::vector<Node>& nodes)
 {
   if (root == nullptr) {
     return;

@@ -1,0 +1,86 @@
+MaxValues
+Soldier 6 3
+Spy 1 3
+Wall 4 0
+Leader 10 0
+#
+DmgValues
+Soldier Soldier Off Off 2
+Soldier Soldier Off On 1
+Soldier Soldier On Off 1
+Soldier Soldier On On 0
+#
+Soldier Spy Off Off 1
+Soldier Spy Off On 0
+Soldier Spy On Off 1
+Soldier Spy On On 0
+#
+Spy Soldier Off Off 0
+Spy Soldier Off On 0
+Spy Soldier On Off 128 
+Spy Soldier On On 0
+#
+Spy Spy Off Off 50
+Spy Spy Off On 0
+Spy Spy On Off 100
+Spy Spy On On 0
+#
+Leader Leader Off Off 0
+Leader Leader Off On 0
+Leader Leader On Off 0
+Leader Leader On On 0
+#
+Leader Spy Off Off 1
+Leader Spy Off On 0
+Leader Spy On Off 1
+Leader Spy On On 0
+#
+Spy Leader Off Off 0
+Spy Leader Off On 0
+Spy Leader On Off 0
+Spy Leader On On 0
+#
+Leader Soldier Off Off 2
+Leader Soldier Off On 1
+Leader Soldier On Off 2
+Leader Soldier On On 1
+#
+Soldier Leader Off Off 1
+Soldier Leader Off On 1
+Soldier Leader On Off 0
+Soldier Leader On On 0
+#
+Wall Wall Off Off 0
+Wall Wall Off On 0
+Wall Wall On Off 0
+Wall Wall On On 0
+#
+Wall Spy Off Off 0
+Wall Spy Off On 0
+Wall Spy On Off 0
+Wall Spy On On 0
+#
+Spy Wall Off Off 0
+Spy Wall Off On 0
+Spy Wall On Off 0
+Spy Wall On On 0
+#
+Wall Soldier Off Off 0
+Wall Soldier Off On 0
+Wall Soldier On Off 0
+Wall Soldier On On 0
+#
+Soldier Wall Off Off 2
+Soldier Wall Off On 2
+Soldier Wall On Off 0
+Soldier Wall On On 0
+#
+Wall Leader Off Off 0
+Wall Leader Off On 0
+Wall Leader On Off 0
+Wall Leader On On 0
+#
+Leader Wall Off Off 0
+Leader Wall Off On 0
+Leader Wall On Off 0
+Leader Wall On On 0
