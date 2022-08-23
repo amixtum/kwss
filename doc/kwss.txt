@@ -8,7 +8,7 @@ Entity:
   Soldier:
     Interaction:
       Soldier:
-        * Attack/Defend normally -> remove/lose HP (hitpoints)
+        * Attack/Defend normally -> remove/lose HP
         * Defend with Overwatch -> lose reduced amount of HP
       Spy:
         * Attack while Cloak is active -> Spy wins
@@ -39,6 +39,7 @@ Entity:
         * Defend normally -> 1 - turn_p probability to turn other Spy
     Ability:
       Cloak:
+        * toggle on/off by standing still
         * other Entity(s) cannot see (pathfind to) spy
         * attacking from Cloak instantly kills Soldiers
         Cost:

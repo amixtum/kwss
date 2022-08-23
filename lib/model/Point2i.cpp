@@ -1,4 +1,4 @@
-#include "../include/Point2i.h"
+#include "../../include/model/Point2i.h"
 
 Point2i::Point2i(int x, int y)
 {

@@ -12,6 +12,9 @@ find_package(Curses REQUIRED)
 
 include_directories(${CURSES_INCLUDE_DIR})
 
-add_executable(KWSS src/main_test.cpp lib/Window.cpp lib/Point2i.cpp)
+add_executable(KWSS 
+               src/main_test.cpp 
+               lib/model/Point2i.cpp
+               lib/view/Window.cpp)
 
 target_link_libraries(KWSS ${CURSES_LIBRARY})

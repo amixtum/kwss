@@ -1,4 +1,4 @@
-#include "../include/Window.h"
+#include "../../include/view/Window.h"
 #include <curses.h>
 
 Window::Window(int height, int width, int tl_y, int tl_x)

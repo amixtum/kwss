@@ -5,7 +5,7 @@
 
 #include <ncurses.h>
 
-#include "Point2i.h"
+#include "../model/Point2i.h"
 
 class Window {
 public:

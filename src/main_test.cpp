@@ -2,7 +2,7 @@
 
 #include <ncurses.h>
 
-#include "../include/Window.h"
+#include "../include/view/Window.h"
 
 int main(int argc, char **argv) 
 {
