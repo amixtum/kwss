@@ -1,6 +1,7 @@
 #include "../../include/model/Entity.h"
 
-Entity::Entity(EntityType type, Team team, int hp, int stamina)
+Entity::Entity(EntityType type, Team team, int hp, int stamina, Point2i pos)
+  : _position(pos.x, pos.y)
 {
   _type = type;
   _team = team;
@@ -9,44 +10,60 @@ Entity::Entity(EntityType type, Team team, int hp, int stamina)
   _state = AbilityState::Off;
 }
 
+Entity::Entity(const Entity& other)
+  : _position(other.position().x, other.position().y)
+{
+  _type = other.type();
+  _team = other.team();
+  _hp = other.hp();
+  _stamina = other.stamina();
+  _state = other.state();
+}
+
 EntityType
-Entity::type()
+Entity::type() const
 {
   return _type;
 }
 
 Team
-Entity::team()
+Entity::team() const
 {
   return _team;
 }
 
 int
-Entity::hp()
+Entity::hp() const
 {
   return _hp;
 }
 
 int
-Entity::stamina()
+Entity::stamina() const
 {
   return _stamina;
 }
 
 AbilityState
-Entity::state()
+Entity::state() const
 {
   return _state;
 }
 
+Point2i
+Entity::position() const
+{
+  return _position;
+}
+
 bool
-Entity::alive()
+Entity::alive() const
 {
   return hp() > 0;
 }
 
 bool
-Entity::has_stamina()
+Entity::has_stamina() const
 {
   return stamina() > 0;
 }
@@ -98,6 +115,12 @@ Entity::toggle_ability_state()
   }
 }
 
+void
+Entity::set_position(Point2i pos)
+{
+  _position = pos;
+}
+
 Entity&
 Entity::operator=(const Entity& other)
 {
@@ -106,6 +129,7 @@ Entity::operator=(const Entity& other)
   _hp = other._hp;
   _stamina = other._stamina;
   _state = other._state;
+  _position = other._position;
 
   return *this;
 }

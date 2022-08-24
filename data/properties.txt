@@ -1,3 +1,5 @@
+Dimensions 80 20
+#
 MaxValues
 Soldier 6 3
 Spy 1 3

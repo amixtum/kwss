@@ -79,6 +79,11 @@ read_table_from_file(std::string fname)
         auto dmg = atoi(words[4].c_str());
 
         table.set_dmg(att_type, def_type, att_state, def_state, dmg);
+      } else if (!first_section && words.size() == 3 &&
+                 words[0].compare("Dimensions") == 0) {
+        auto width = atoi(words[1].c_str());
+        auto height = atoi(words[2].c_str());
+        table.set_dimensions(Point2i(width, height));
       }
     }
   }

@@ -46,6 +46,8 @@ public:
 
   void set_max_stamina(EntityType entity, int stamina);
 
+  void set_dimensions(Point2i dimensions);
+
   std::function<void(Entity&, Entity&)> get_fn(Entity& attacker,
                                                Entity& defender);
 
@@ -55,6 +57,8 @@ public:
 
   int get_max_stamina(EntityType entity);
 
+  Point2i get_dimensions();
+
   void battle(Entity& attacker, Entity& defender);
 
 private:
@@ -62,6 +66,7 @@ private:
   DmgTable _dmg_table;
   HPTable _hp_table;
   StaminaTable _stamina_table;
+  Point2i _dimensions = Point2i(0, 0);
 };
 
 #endif // BattleTable.h included

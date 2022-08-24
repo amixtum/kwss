@@ -19,6 +19,9 @@ add_executable(KWSS
                lib/model/Point2i.cpp
                lib/model/Entity.cpp
                lib/model/BattleTable.cpp
+               lib/model/EntityTable.cpp
+               lib/model/EntityBehavior.cpp
+               lib/model/EntitySpawner.cpp
                lib/view/Window.cpp)
 
 target_link_libraries(KWSS ${CURSES_LIBRARY})

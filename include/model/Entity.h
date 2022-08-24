@@ -5,26 +5,31 @@
 
 #include "AbilityState.h"
 #include "EntityType.h"
+#include "Point2i.h"
 #include "Team.h"
 
 class Entity
 {
 public:
-  Entity(EntityType type, Team team, int hp, int stamina);
+  Entity(EntityType type, Team team, int hp, int stamina, Point2i pos);
 
-  EntityType type();
+  Entity(const Entity& other);
 
-  Team team();
+  EntityType type() const;
 
-  int hp();
+  Team team() const;
 
-  int stamina();
+  int hp() const;
 
-  AbilityState state();
+  int stamina() const;
 
-  bool alive();
+  AbilityState state() const;
 
-  bool has_stamina();
+  Point2i position() const;
+
+  bool alive() const;
+
+  bool has_stamina() const;
 
   void set_team(Team team);
 
@@ -40,6 +45,8 @@ public:
 
   void toggle_ability_state();
 
+  void set_position(Point2i pos);
+
   Entity& operator=(const Entity& other);
 
 protected:
@@ -50,6 +57,8 @@ protected:
   int _stamina;
 
   AbilityState _state;
+
+  Point2i _position;
 };
 
 #endif // Entity.h included

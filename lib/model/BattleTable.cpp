@@ -5,11 +5,11 @@
 BattleTable::BattleTable()
 {
   auto basic_attack = [this](Entity& att, Entity& def) {
-    def.add_hp(get_dmg(att, def));
+    def.add_hp(-get_dmg(att, def));
   };
 
   auto basic_attack_reverse = [this](Entity& att, Entity& def) {
-    att.add_hp(get_dmg(def, att));
+    att.add_hp(-get_dmg(def, att));
   };
 
   auto uncloak_spy_def = [](Entity&, Entity& def) {
@@ -444,6 +444,12 @@ BattleTable::set_max_stamina(EntityType entity, int stamina)
   _stamina_table[static_cast<int>(entity)] = stamina;
 }
 
+void
+BattleTable::set_dimensions(Point2i dimensions)
+{
+  _dimensions = dimensions;
+}
+
 std::function<void(Entity&, Entity&)>
 BattleTable::get_fn(Entity& attacker, Entity& defender)
 {
@@ -470,6 +476,12 @@ int
 BattleTable::get_max_stamina(EntityType entity)
 {
   return _stamina_table[static_cast<int>(entity)];
+}
+
+Point2i
+BattleTable::get_dimensions()
+{
+  return _dimensions;
 }
 
 void

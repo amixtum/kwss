@@ -1,3 +1,10 @@
+Grid:
+  Dimensions:
+    * width
+    * height
+  Point:
+    * Either has an Entity or is empty
+
 Entity:
   CommonProperty:
     Type:
@@ -20,6 +27,11 @@ Entity:
           * Defend while Cloak is active -> Spy wins
           * Attack normally -> Soldier wins
           * Defend normally/with Overwatch -> Soldier wins
+        Wall:
+          * Can attack wall
+          * Cannot move onto wall
+        Leader:
+          * Same as Soldier
       Ability:
         Overwatch:
           * toggled on/off ability (activate by standing still)
@@ -42,6 +54,10 @@ Entity:
           * Defend while Cloak is active -> Stalemate
           * Attack normally -> turn_p probability to turn other Spy
           * Defend normally -> 1 - turn_p probability to turn other Spy
+        Wall:
+          * Spys cannot attack or move over walls
+        Leader:
+          * Spys cannot attack Leaders
       Ability:
         Cloak:
           * toggle on/off by standing still
@@ -49,3 +65,22 @@ Entity:
           * attacking from Cloak instantly kills Soldiers
           Cost:
             * each turn with Cloak active costs cloak_cost Stamina
+
+      Wall:
+        Interaction:
+          * does not move or attack 
+
+      Leader:
+        Interaction:
+          * does not move
+          * attacks adjacent, unCloacked units
+          * can be attacked by Soldiers but not Spys
+
+  Spawning:
+    * Left and Right teams spawn simultaneously (interleaved)
+  Movement:
+    Ordering:
+      * Random ordering of moves
+      * Entitys that attempt to occupy the same space as another Entity battle
+        * e.g. one entity stays still (activates ability) and another moves to the Point they are occupying
+

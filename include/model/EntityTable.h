@@ -22,11 +22,15 @@ class EntityTable
 public:
   struct PointCompare
   {
-    bool operator()(Point2i& lhs, Point2i& rhs);
+    bool operator()(const Point2i& lhs, const Point2i& rhs) const;
   };
 
+  using Nbrs = std::map<Point2i, Entity, PointCompare>;
+
 public:
-  EntityTable(std::string pfile, Point2i dimensions);
+  EntityTable(BattleTable* battle_table);
+
+  Point2i get_dimensions();
 
   Entity& put_entity(Point2i pos, EntityType type, Team team);
 
@@ -36,88 +40,73 @@ public:
 
   Entity& get_entity(Point2i pos);
 
-  bool has_entity(Point2i pos);
+  bool has_entity(Point2i pos) const;
 
-  std::map<Point2i, Entity, PointCompare> in_radius(Point2i center,
-                                                    int radius,
-                                                    Neighborhood n);
+  Nbrs in_radius(Point2i center, int radius, Neighborhood n);
 
-  std::map<Point2i, Entity, PointCompare> in_radius(Point2i center,
-                                                    int radius,
-                                                    EntityType type,
-                                                    Neighborhood n);
+  Nbrs in_radius(Point2i center, int radius, EntityType type, Neighborhood n);
 
-  std::map<Point2i, Entity, PointCompare> enemies_in_radius(Point2i center,
-                                                            int radius,
-                                                            Neighborhood n);
+  Nbrs enemies_in_radius(Point2i center, int radius, Neighborhood n);
 
-  std::map<Point2i, Entity, PointCompare> enemies_in_radius(Point2i center,
-                                                            int radius,
-                                                            EntityType type,
-                                                            Neighborhood n);
+  Nbrs enemies_in_radius(Point2i center,
+                         int radius,
+                         EntityType type,
+                         Neighborhood n);
 
-  std::map<Point2i, Entity, PointCompare> friendly_in_radius(Point2i center,
-                                                             int radius,
-                                                             Neighborhood n);
+  Nbrs friendly_in_radius(Point2i center, int radius, Neighborhood n);
 
-  std::map<Point2i, Entity, PointCompare> friendly_in_radius(Point2i center,
-                                                             int radius,
-                                                             EntityType type,
-                                                             Neighborhood n);
+  Nbrs friendly_in_radius(Point2i center,
+                          int radius,
+                          EntityType type,
+                          Neighborhood n);
 
-  std::map<Point2i, Entity, PointCompare> empty_in_radius(Point2i center,
-                                                          int radius,
-                                                          Neighborhood n);
+  Nbrs empty_in_radius(Point2i center, int radius, Neighborhood n);
 
 private:
   void in_radius_helper(Point2i center,
                         int radius,
-                        std::map<Point2i, Entity, PointCompare>& to_fill,
+                        Nbrs& to_fill,
                         Neighborhood n);
 
   void in_radius_helper_type(Point2i center,
                              int radius,
-                             std::map<Point2i, Entity, PointCompare>& to_fill,
+                             Nbrs& to_fill,
                              EntityType type,
                              Neighborhood n);
 
-  void enemies_in_radius_helper(
-    Point2i center,
-    int radius,
-    std::map<Point2i, Entity, PointCompare>& to_fill,
-    Team team,
-    Neighborhood n);
+  void enemies_in_radius_helper(Point2i center,
+                                int radius,
+                                Nbrs& to_fill,
+                                Team team,
+                                Neighborhood n);
 
-  void friendly_in_radius_helper(
-    Point2i center,
-    int radius,
-    std::map<Point2i, Entity, PointCompare>& to_fill,
-    Team team,
-    Neighborhood n);
+  void friendly_in_radius_helper(Point2i center,
+                                 int radius,
+                                 Nbrs& to_fill,
+                                 Team team,
+                                 Neighborhood n);
 
-  void enemies_in_radius_helper_type(
-    Point2i center,
-    int radius,
-    std::map<Point2i, Entity, PointCompare>& to_fill,
-    Team team,
-    EntityType type,
-    Neighborhood n);
+  void enemies_in_radius_helper_type(Point2i center,
+                                     int radius,
+                                     Nbrs& to_fill,
+                                     Team team,
+                                     EntityType type,
+                                     Neighborhood n);
 
-  void friendly_in_radius_helper_type(
-    Point2i center,
-    int radius,
-    std::map<Point2i, Entity, PointCompare>& to_fill,
-    Team team,
-    EntityType type,
-    Neighborhood n);
+  void friendly_in_radius_helper_type(Point2i center,
+                                      int radius,
+                                      Nbrs& to_fill,
+                                      Team team,
+                                      EntityType type,
+                                      Neighborhood n);
 
   void empty_in_radius_helper(Point2i center,
                               int radius,
-                              std::map<Point2i, Entity, PointCompare>& to_fill,
+                              Nbrs& to_fill,
                               Neighborhood n);
 
 private:
-  BattleTable _battle_table;
+  BattleTable* _battle_table = nullptr;
 
   Grid _grid;
 
