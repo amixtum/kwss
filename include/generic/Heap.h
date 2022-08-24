@@ -87,7 +87,7 @@ Heap<K, T>::extract_min()
 
 template<class K, class T>
 void
-Heap<K, T>::_heapify()
+Heap<K, T>::heapify()
 {
   for (auto index = std::floor(_heap.size() / 2); index > 0; index -= 1) {
     auto outerIndex = index;

@@ -40,7 +40,9 @@ public:
 
   void toggle_ability_state();
 
-private:
+  Entity& operator=(const Entity& other);
+
+protected:
   Team _team;
   EntityType _type;
 

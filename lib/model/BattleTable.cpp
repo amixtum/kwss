@@ -475,6 +475,11 @@ BattleTable::get_max_stamina(EntityType entity)
 void
 BattleTable::battle(Entity& attacker, Entity& defender)
 {
+  if (attacker.type() == EntityType::Size ||
+      defender.type() == EntityType::Size) {
+    return;
+  }
+
   _fn_table[static_cast<int>(attacker.type())][static_cast<int>(
     defender.type())][static_cast<int>(attacker.state())]
            [static_cast<int>(defender.state())](attacker, defender);

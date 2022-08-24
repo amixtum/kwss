@@ -97,3 +97,15 @@ Entity::toggle_ability_state()
     _state = AbilityState::On;
   }
 }
+
+Entity&
+Entity::operator=(const Entity& other)
+{
+  _team = other._team;
+  _type = other._type;
+  _hp = other._hp;
+  _stamina = other._stamina;
+  _state = other._state;
+
+  return *this;
+}
