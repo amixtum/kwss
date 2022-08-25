@@ -1,12 +1,18 @@
 #include <cstring>
+#include <iostream>
 
 #include <ncurses.h>
 
 #include "../include/view/Window.h"
+#include "../include/view/TableRender.h"
+
+#include "../include/model/GameManager.h"
 
 int
 main(int argc, char** argv)
 {
+  GameManager gm("/home/ganiparrott/src/projects/kwss/data/properties.txt");
+  
   // call this before using ncurses
   initscr();
 
@@ -22,29 +28,20 @@ main(int argc, char** argv)
   int height, width;
   getmaxyx(stdscr, height, width);
 
+  std::cout << "width, height: " << width << ", " << height << std::endl;
+
   Window win(height, width, 0, 0);
+  TableRender render;
 
-  win.add_border();
-
-  int mid_x = (width - strlen("hello world")) / 2;
-  int mid_y = height / 2;
-
-  wmove(win.ptr(), mid_y, mid_x);
-
-  // print hellow rold
-  wprintw(win.ptr(), "Hello world");
-
-  // refresh the window so we can see it
+  render.render(win, gm.grid(), Point2i(0, 0), Point2i(80, 20));
   win.refresh();
-
-  // wait for a keypress
   wgetch(win.ptr());
-
-  win.remove_border();
-
-  // win.refresh();
-
-  wgetch(win.ptr());
+  while (gm.tick()) {
+    render.render(win, gm.grid(), Point2i(0, 0), Point2i(80, 20));
+    win.refresh();
+    // wait for a keypress
+    wgetch(win.ptr());
+  }
 
   // end curses
   endwin();

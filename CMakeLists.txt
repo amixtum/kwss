@@ -16,12 +16,15 @@ add_executable(KWSS
                src/main_test.cpp 
                lib/util/Neighborhood.cpp
                lib/util/TypeParse.cpp
+               lib/util/DebugLog.cpp
                lib/model/Point2i.cpp
                lib/model/Entity.cpp
                lib/model/BattleTable.cpp
                lib/model/EntityTable.cpp
                lib/model/EntityBehavior.cpp
                lib/model/EntitySpawner.cpp
-               lib/view/Window.cpp)
+               lib/model/GameManager.cpp
+               lib/view/Window.cpp
+               lib/view/TableRender.cpp)
 
 target_link_libraries(KWSS ${CURSES_LIBRARY})

@@ -12,9 +12,9 @@ template<class K, class V>
 class BinarySearchTree
 {
 public:
-  using Node = std::shared_ptr<BinarySearchTree<K, V>>;
+  using Node = BinarySearchTree<K, V>*;
 
-  BinarySearchTree(K& key, V& val);
+  BinarySearchTree(K key, V val);
 
   Node node();
 
@@ -29,6 +29,7 @@ public:
   Node right();
 
   Node root();
+
 
 protected:
   void set_ptrs(Node parent, Node left, Node right);
@@ -53,7 +54,7 @@ private:
   Node _right = nullptr;
 
 public:
-  static Node MakeNode(K key, V value);
+  static BinarySearchTree<K, V> MakeNode(K key, V value);
 
   static Node Search(Node root, K key);
 
@@ -75,7 +76,7 @@ public:
 
   static void RandomTraverse(Node root, std::vector<Node>& nodes);
 
-  static Node InsertNode(Node root, K key, V value);
+  static BinarySearchTree<K, V> InsertNode(Node root, K key, V value);
 
   static Node InsertNode(Node root, Node node);
 
@@ -98,7 +99,7 @@ private:
 };
 
 template<class K, class V>
-BinarySearchTree<K, V>::BinarySearchTree(K& key, V& val)
+BinarySearchTree<K, V>::BinarySearchTree(K key, V val)
   : _key(key)
   , _value(val)
 {
@@ -120,9 +121,7 @@ template<class K, class V>
 typename BinarySearchTree<K, V>::Node
 BinarySearchTree<K, V>::node()
 {
-  auto c = BinarySearchTree<K, V>::MakeNode(key(), value());
-  c->set_ptrs(_parent, _left, _right);
-  return c;
+  return this;
 }
 
 template<class K, class V>
@@ -344,7 +343,7 @@ BinarySearchTree<K, V>::Successor(Node node)
 }
 
 template<class K, class V>
-typename BinarySearchTree<K, V>::Node
+BinarySearchTree<K, V>
 BinarySearchTree<K, V>::InsertNode(Node root, K key, V value)
 {
   std::random_device rd;
@@ -367,15 +366,15 @@ BinarySearchTree<K, V>::InsertNode(Node root, K key, V value)
     }
   }
 
-  newNode->set_parent(newParent);
+  newNode.set_parent(newParent);
 
-  if (newNode->key() < newParent->key()) {
-    newParent->set_left(newNode);
+  if (newNode.key() < newParent->key()) {
+    newParent->set_left(newNode.node());
   } else {
-    newParent->set_right(newNode);
+    newParent->set_right(newNode.node());
   }
 
-  BinarySearchTree<K, V>::_IncrementSize(newNode);
+  BinarySearchTree<K, V>::_IncrementSize(newNode.node());
 
   return newNode;
 }
@@ -634,11 +633,12 @@ BinarySearchTree<K, V>::RandomTraverse(Node root, std::vector<Node>& nodes)
   }
 }
 
+// allocates a new binary search tree
 template<class K, class V>
-typename BinarySearchTree<K, V>::Node
+BinarySearchTree<K, V>
 BinarySearchTree<K, V>::MakeNode(K key, V value)
 {
-  return std::make_shared<BinarySearchTree<K, V>>(key, value);
+  return BinarySearchTree<K, V>(key, value);
 }
 
 template<class K, class V>

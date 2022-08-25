@@ -28,6 +28,8 @@ public:
 
   void add_char_at(Point2i at, unsigned char c);
 
+  void add_char_at_color(Point2i at, unsigned char c, int color);
+
   // default window border
   void add_border();
 

@@ -19,28 +19,58 @@ EntityTable::EntityTable(BattleTable* battle_table)
   }
 }
 
+Team
+EntityTable::get_winner()
+{
+  if (!left_leader->alive()) {
+    return Team::Right;
+  } else if (!right_leader->alive()) {
+    return Team::Left;
+  }
+
+  return Team::Size;
+}
+
 Point2i
 EntityTable::get_dimensions()
 {
   return _dimensions;
 }
 
-Entity&
+Entity
 EntityTable::put_entity(Point2i pos, EntityType type, Team team)
 {
+  if (type == EntityType::Size) {
+    _grid[pos.x][pos.y] = Entity(type,
+                                 team,
+                                 0,
+                                 0,
+                                 pos);
+    return _grid[pos.x][pos.y];
+  }
   _grid[pos.x][pos.y] = Entity(type,
                                team,
                                _battle_table->get_max_hp(type),
                                _battle_table->get_max_stamina(type),
                                pos);
 
+  if (type == EntityType::Leader) {
+    if (team == Team::Left) {
+      left_leader = &_grid[pos.x][pos.y];
+    } else if (team == Team::Right) {
+      right_leader = &_grid[pos.x][pos.y];
+    }
+  }
+
   return _grid[pos.x][pos.y];
 }
 
-Entity&
+Entity
 EntityTable::put_entity(Point2i pos, Entity& entity)
 {
   _grid[pos.x][pos.y] = entity;
+  
+  entity.set_position(pos);
 
   return _grid[pos.x][pos.y];
 }
@@ -173,7 +203,7 @@ EntityTable::in_radius_helper(Point2i center,
   }
 
   for (auto& neighbor :
-       neighbors(n, center, 0, 0, _dimensions.x, _dimensions.y)) {
+       neighbors(n, center, 0, 0, _dimensions.x - 1, _dimensions.y - 1)) {
     auto e_at = get_entity(neighbor);
     if (e_at.type() == EntityType::Wall) {
       to_fill.insert({ neighbor, e_at });
@@ -202,7 +232,7 @@ EntityTable::in_radius_helper_type(Point2i center,
   }
 
   for (auto& neighbor :
-       neighbors(n, center, 0, 0, _dimensions.x, _dimensions.y)) {
+       neighbors(n, center, 0, 0, _dimensions.x - 1, _dimensions.y - 1)) {
     auto e_at = get_entity(neighbor);
     if (e_at.type() == EntityType::Wall) {
       if (type == EntityType::Wall) {
@@ -233,7 +263,7 @@ EntityTable::enemies_in_radius_helper(Point2i center,
   }
 
   for (auto& neighbor :
-       neighbors(n, center, 0, 0, _dimensions.x, _dimensions.y)) {
+       neighbors(n, center, 0, 0, _dimensions.x - 1, _dimensions.y - 1)) {
     auto e_at = get_entity(neighbor);
     if (e_at.type() == EntityType::Wall) {
       continue;
@@ -262,7 +292,7 @@ EntityTable::friendly_in_radius_helper(Point2i center,
   }
 
   for (auto& neighbor :
-       neighbors(n, center, 0, 0, _dimensions.x, _dimensions.y)) {
+       neighbors(n, center, 0, 0, _dimensions.x - 1, _dimensions.y - 1)) {
     auto e_at = get_entity(neighbor);
     if (e_at.type() == EntityType::Wall) {
       continue;
@@ -290,7 +320,7 @@ EntityTable::enemies_in_radius_helper_type(Point2i center,
   }
 
   for (auto& neighbor :
-       neighbors(n, center, 0, 0, _dimensions.x, _dimensions.y)) {
+       neighbors(n, center, 0, 0, _dimensions.x - 1, _dimensions.y - 1)) {
     auto e_at = get_entity(neighbor);
     if (e_at.type() == EntityType::Wall) {
       continue;
@@ -322,7 +352,7 @@ EntityTable::friendly_in_radius_helper_type(Point2i center,
   }
 
   for (auto& neighbor :
-       neighbors(n, center, 0, 0, _dimensions.x, _dimensions.y)) {
+       neighbors(n, center, 0, 0, _dimensions.x - 1, _dimensions.y - 1)) {
     auto e_at = get_entity(neighbor);
     if (e_at.type() == EntityType::Wall) {
       continue;
@@ -350,7 +380,7 @@ EntityTable::empty_in_radius_helper(Point2i center,
   }
 
   for (auto& neighbor :
-       neighbors(n, center, 0, 0, _dimensions.x, _dimensions.y)) {
+       neighbors(n, center, 0, 0, _dimensions.x - 1, _dimensions.y - 1)) {
     auto e_at = get_entity(neighbor);
 
     if (e_at.type() == EntityType::Wall) {

@@ -480,6 +480,12 @@ BattleTable::set_wave_size(int n)
   _wave_size = n;
 }
 
+void 
+BattleTable::set_wall_factor(float n)
+{
+  _wall_factor = n;
+}
+
 std::function<void(Entity&, Entity&)>
 BattleTable::get_fn(Entity& attacker, Entity& defender)
 {
@@ -542,6 +548,12 @@ int
 BattleTable::get_wave_size()
 {
   return _wave_size;
+}
+
+float
+BattleTable::get_wall_factor()
+{
+  return _wall_factor;
 }
 
 void

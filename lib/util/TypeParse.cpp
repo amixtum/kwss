@@ -1,4 +1,5 @@
 #include <fstream>
+#include <iostream>
 #include <vector>
 
 #include "../../include/util/TypeParse.h"
@@ -38,7 +39,8 @@ read_table_from_file(std::string fname)
 
   std::string line;
 
-  std::ifstream file(fname);
+  std::ifstream file;
+  file.open(fname, std::ios::in);
 
   if (file.is_open()) {
     auto first_section = false;
@@ -57,7 +59,7 @@ read_table_from_file(std::string fname)
       std::vector<std::string> words;
       int index = 0;
       int last_index = 0;
-      while (index < static_cast<int>(line.length())) {
+      while (index != -1) {
         index = line.find(' ', last_index);
         words.push_back(line.substr(last_index, index - last_index));
         last_index = index + 1;
@@ -87,17 +89,26 @@ read_table_from_file(std::string fname)
                  words[0].compare("Dimensions") == 0) {
         auto width = atoi(words[1].c_str());
         auto height = atoi(words[2].c_str());
+
         table.set_dimensions(Point2i(width, height));
       } else if (!first_section && words.size() == 4 &&
                  words[0].compare("Respawn") == 0) {
         auto interval = atoi(words[1].c_str());
         auto attempts = atoi(words[2].c_str());
         auto wave_size = atoi(words[3].c_str());
+
         table.set_respawn_interval(interval);
         table.set_spawn_attempts(attempts);
         table.set_wave_size(wave_size);
+      } else if (!first_section && words.size() == 2 &&
+                 words[0].compare("WallFactor") == 0) {
+        auto wall_factor = atof(words[1].c_str());
+
+        table.set_wall_factor(wall_factor);
       }
     }
+
+    file.close();
   }
 
   return table;

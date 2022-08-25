@@ -1,6 +1,8 @@
 #ifndef GAME_MANGER_H_
 #define GAME_MANGER_H_
 
+#include <vector>
+
 #include "../generic/BinarySearchTree.h"
 
 #include "BattleTable.h"
@@ -16,7 +18,19 @@ class GameManager
 public:
   GameManager(std::string pfile);
 
+  bool tick();
+
+  Team winner();
+
+  EntityTable &grid();
+
 private:
+  void setup();
+
+  void spawn_units();
+
+  void spawn_walls();
+
   void move_entities();
 
   bool spawn(EntityType type, Team team);
@@ -27,8 +41,6 @@ private:
   EntityTable _entity_table;
 
   EntitySpawner _spawner;
-
-  Node _move_tree = nullptr;
 };
 
 #endif // GameManager.h included

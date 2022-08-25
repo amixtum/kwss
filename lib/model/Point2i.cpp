@@ -20,6 +20,18 @@ Point2i::length() const
   return std::sqrt((x * x) + (y * y));
 }
 
+std::string
+Point2i::to_string() const
+{
+  std::string r;
+  r.push_back('(');
+  r.append(std::to_string(x));
+  r.append(", ");
+  r.append(std::to_string(y));
+  r.push_back(')');
+  return r;
+}
+
 Point2i&
 Point2i::operator=(const Point2i& other)
 {

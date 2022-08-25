@@ -1,4 +1,5 @@
 #include "../../include/model/EntityBehavior.h"
+#include "../../include/util/DebugLog.h"
 #include <climits>
 #include <cmath>
 #include <random>
@@ -10,11 +11,18 @@ EntityBehavior::spy_behavior(EntityTable& table,
                              Neighborhood n,
                              float distance_threshold)
 {
+  DebugLog logger;
+
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  if (table.has_entity(center)) {
+  if (true) {
     auto entity = table.get_entity(center);
+    if (entity.type() != EntityType::Spy) {
+      logger.write("Wrong entity type in spy_behavior at position ");
+      logger.write(center.to_string());
+      logger.write("\n");
+    }
 
     auto enemies = EntityBehavior::count_enemy(table, center, sight_radius, n);
 
@@ -31,7 +39,7 @@ EntityBehavior::spy_behavior(EntityTable& table,
             return EntityBehavior::move_to_nearest_enemy(
               table, center, sight_radius, n);
           } else {
-            return EntityBehavior::runaway_move(table, center, sight_radius, n);
+            return EntityBehavior::attack_move(table, center, sight_radius, n);
           }
         }
 
@@ -71,7 +79,7 @@ EntityBehavior::soldier_behavior(EntityTable& table,
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  if (table.has_entity(center)) {
+  if (true) {
     auto entity = table.get_entity(center);
 
     auto enemies = EntityBehavior::count_enemy(table, center, sight_radius, n);
@@ -85,18 +93,14 @@ EntityBehavior::soldier_behavior(EntityTable& table,
 
       if (friendly < enemies) {
         if (nearest_distance < distance_threshold) {
-          return center;
+          return EntityBehavior::runaway_move(table, center, sight_radius, n);
         }
 
-        return EntityBehavior::runaway_move(table, center, sight_radius, n);
+        return center;
       } else {
         if (nearest_distance < distance_threshold) {
-          if (gen() % 255 < 127) {
-            return EntityBehavior::move_to_nearest_enemy(
-              table, center, sight_radius, n);
-          }
-
-          return center;
+          return EntityBehavior::move_to_nearest_enemy(
+            table, center, sight_radius, n);
         }
 
         return EntityBehavior::attack_move(table, center, sight_radius, n);
@@ -119,34 +123,34 @@ EntityBehavior::random_move(EntityTable& table,
   std::mt19937 gen(rd());
   auto entity = table.get_entity(center);
   auto valid_moves = table.empty_in_radius(center, 1, n);
-  auto iter = valid_moves.begin();
 
   if (valid_moves.size() > 0) {
-    Point2i selected(iter->first);
+    std::vector<Point2i> advancing_moves;
     if (entity.team() == Team::Left) {
       for (auto& p : valid_moves) {
-        if (p.first.x >= selected.x) {
-          selected = p.first;
-          if (gen() % 255 < 127) {
-            break;
-          }
+        if (p.first.x > center.x) {
+          advancing_moves.push_back(p.first);
         }
       }
     } else if (entity.team() == Team::Right) {
       for (auto& p : valid_moves) {
-        if (p.first.x <= selected.x) {
-          selected = p.first;
-          if (gen() % 255 < 127) {
-            break;
-          }
+        if (p.first.x < center.x) {
+          advancing_moves.push_back(p.first);
         }
       }
     }
-
-    return selected;
+    
+    if (advancing_moves.size() > 0) {
+      return advancing_moves[gen() % advancing_moves.size()];
+    } else {
+      auto iter = valid_moves.begin();
+      std::advance(iter, gen() % valid_moves.size());
+      return iter->first;
+    }
   } else {
-    return EntityBehavior::move_to_nearest_of_type(
+    auto try_wall =  EntityBehavior::move_to_nearest_of_type(
       table, center, sight_radius, n, EntityType::Wall);
+    return try_wall;
   }
 }
 
@@ -251,6 +255,10 @@ EntityBehavior::move_to_nearest_of_type(EntityTable& table,
       }
     }
 
+    if ((nearest - center).length() < 2) {
+      return nearest;
+    }
+
     min_dist = MAXFLOAT;
     for (auto& pos : valid_moves) {
       auto diff = pos.first - nearest;
@@ -287,6 +295,10 @@ EntityBehavior::move_to_nearest_of_type_enemy(EntityTable& table,
         min_dist = dist;
         nearest = enemy.first;
       }
+    }
+
+    if ((nearest - center).length() < 2) {
+      return nearest;
     }
 
     min_dist = MAXFLOAT;
@@ -326,6 +338,10 @@ EntityBehavior::move_to_nearest_enemy(EntityTable& table,
       }
     }
 
+    if ((nearest - center).length() < 2) {
+      return nearest;
+    }
+
     min_dist = MAXFLOAT;
     for (auto& pos : valid_moves) {
       auto diff = pos.first - nearest;
@@ -352,18 +368,18 @@ EntityBehavior::runaway_from_nearest_enemy(EntityTable& table,
 
   if (enemies.size() != 0) {
     auto valid_moves = table.empty_in_radius(center, 1, n);
+    float min_dist = MAXFLOAT;
     float max_dist = 0;
 
     for (auto& enemy : enemies) {
       auto diff = center - enemy.first;
       float dist = diff.length();
-      if (dist > max_dist) {
-        max_dist = dist;
+      if (dist < min_dist) {
+        min_dist = dist;
         nearest = enemy.first;
       }
     }
 
-    max_dist = 0;
     for (auto& pos : valid_moves) {
       auto diff = pos.first - nearest;
       float dist = std::sqrt((diff.x * diff.x) + (diff.y * diff.y));

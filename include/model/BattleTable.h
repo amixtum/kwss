@@ -63,6 +63,8 @@ public:
 
   void set_wave_size(int n);
 
+  void set_wall_factor(float n);
+
   std::function<void(Entity&, Entity&)> get_fn(Entity& attacker,
                                                Entity& defender);
 
@@ -84,6 +86,8 @@ public:
 
   int get_wave_size();
 
+  float get_wall_factor();
+
   void battle(Entity& attacker, Entity& defender);
 
 private:
@@ -97,6 +101,7 @@ private:
   int _respawn_interval = INT_MAX;
   int _spawn_attempts = 0;
   int _wave_size = 0;
+  float _wall_factor = 0;
 };
 
 #endif // BattleTable.h included
