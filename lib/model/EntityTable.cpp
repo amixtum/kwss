@@ -369,5 +369,5 @@ bool
 EntityTable::PointCompare::operator()(const Point2i& lhs,
                                       const Point2i& rhs) const
 {
-  return (lhs.x * lhs.y) + lhs.x == (rhs.x * rhs.y) + rhs.x;
+  return (lhs.x * lhs.y) + lhs.x < (rhs.x * rhs.y) + rhs.x;
 }

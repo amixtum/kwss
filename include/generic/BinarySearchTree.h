@@ -73,6 +73,8 @@ public:
 
   static void Inorder(Node root, std::vector<Node>& nodes);
 
+  static void RandomTraverse(Node root, std::vector<Node>& nodes);
+
   static Node InsertNode(Node root, K key, V value);
 
   static Node InsertNode(Node root, Node node);
@@ -607,6 +609,29 @@ BinarySearchTree<K, V>::Inorder(Node root, std::vector<Node>& nodes)
   BinarySearchTree<K, V>::Inorder(root->left(), nodes);
   nodes.push_back(root);
   BinarySearchTree<K, V>::Inorder(root->right(), nodes);
+}
+
+template<class K, class V>
+void
+BinarySearchTree<K, V>::RandomTraverse(Node root, std::vector<Node>& nodes)
+{
+  if (root == nullptr) {
+    return;
+  }
+  std::random_device rd;
+  std::mt19937 gen(rd());
+
+  auto left_first = gen() % 255 < 127;
+
+  if (left_first) {
+    BinarySearchTree<K, V>::RandomTraverse(root->left(), nodes);
+    nodes.push_back(root);
+    BinarySearchTree<K, V>::RandomTraverse(root->right(), nodes);
+  } else {
+    BinarySearchTree<K, V>::RandomTraverse(root->right(), nodes);
+    nodes.push_back(root);
+    BinarySearchTree<K, V>::RandomTraverse(root->left(), nodes);
+  }
 }
 
 template<class K, class V>

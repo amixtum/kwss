@@ -48,6 +48,10 @@ EntitySpawner::spawn(EntityType type, Team team, int attempts)
   while (try_spawn.type() == EntityType::Size && attempts_left > 0) {
     if (team == Team::Size) {
       x = (gen() % _entity_table->get_dimensions().x);
+    } else if (team == Team::Left) {
+      x += 1;
+    } else if (team == Team::Right) {
+      x -= 1;
     }
 
     try_spawn = EntitySpawner::spawn_helper(

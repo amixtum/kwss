@@ -63,13 +63,17 @@ read_table_from_file(std::string fname)
         last_index = index + 1;
       }
 
-      if (first_section && words.size() == 3) {
+      if (first_section && words.size() == 5) {
         auto type = parse_type(words[0]);
         auto hp = atoi(words[1].c_str());
         auto stamina = atoi(words[2].c_str());
+        auto sight_radius = atoi(words[3].c_str());
+        auto distance_threshold = atof(words[4].c_str());
 
         table.set_max_hp(type, hp);
         table.set_max_stamina(type, stamina);
+        table.set_sight_radius(type, sight_radius);
+        table.set_distance_threshold(type, distance_threshold);
 
       } else if (!first_section && words.size() == 5) {
         auto att_type = parse_type(words[0]);
@@ -84,6 +88,14 @@ read_table_from_file(std::string fname)
         auto width = atoi(words[1].c_str());
         auto height = atoi(words[2].c_str());
         table.set_dimensions(Point2i(width, height));
+      } else if (!first_section && words.size() == 4 &&
+                 words[0].compare("Respawn") == 0) {
+        auto interval = atoi(words[1].c_str());
+        auto attempts = atoi(words[2].c_str());
+        auto wave_size = atoi(words[3].c_str());
+        table.set_respawn_interval(interval);
+        table.set_spawn_attempts(attempts);
+        table.set_wave_size(wave_size);
       }
     }
   }

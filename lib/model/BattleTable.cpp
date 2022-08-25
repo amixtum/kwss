@@ -445,9 +445,39 @@ BattleTable::set_max_stamina(EntityType entity, int stamina)
 }
 
 void
+BattleTable::set_sight_radius(EntityType type, int radius)
+{
+  _sight_table[static_cast<int>(type)] = radius;
+}
+
+void
+BattleTable::set_distance_threshold(EntityType type, float distance_threshold)
+{
+  _threshold_table[static_cast<int>(type)] = distance_threshold;
+}
+
+void
 BattleTable::set_dimensions(Point2i dimensions)
 {
   _dimensions = dimensions;
+}
+
+void
+BattleTable::set_respawn_interval(int n)
+{
+  _respawn_interval = n;
+}
+
+void
+BattleTable::set_spawn_attempts(int n)
+{
+  _spawn_attempts = n;
+}
+
+void
+BattleTable::set_wave_size(int n)
+{
+  _wave_size = n;
 }
 
 std::function<void(Entity&, Entity&)>
@@ -478,10 +508,40 @@ BattleTable::get_max_stamina(EntityType entity)
   return _stamina_table[static_cast<int>(entity)];
 }
 
+int
+BattleTable::get_sight_radius(EntityType type)
+{
+  return _sight_table[static_cast<int>(type)];
+}
+
+float
+BattleTable::get_distance_threshold(EntityType type)
+{
+  return _threshold_table[static_cast<int>(type)];
+}
+
 Point2i
 BattleTable::get_dimensions()
 {
   return _dimensions;
+}
+
+int
+BattleTable::get_respawn_interval()
+{
+  return _respawn_interval;
+}
+
+int
+BattleTable::get_spawn_attempts()
+{
+  return _spawn_attempts;
+}
+
+int
+BattleTable::get_wave_size()
+{
+  return _wave_size;
 }
 
 void
