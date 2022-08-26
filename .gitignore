@@ -1,5 +1,5 @@
 build/
 .cache/
-log/
+log/*
 
 compile_commands.json

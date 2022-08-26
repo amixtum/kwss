@@ -11,17 +11,10 @@ EntityBehavior::spy_behavior(EntityTable& table,
                              Neighborhood n,
                              float distance_threshold)
 {
-  DebugLog logger;
-
   std::random_device rd;
   std::mt19937 gen(rd());
 
   auto entity = table.get_entity(center);
-  if (entity.type() != EntityType::Spy) {
-    logger.write("Wrong entity type in spy_behavior at position ");
-    logger.write(center.to_string());
-    logger.write("\n");
-  }
 
   auto enemies = EntityBehavior::count_enemy(table, center, sight_radius, n);
 
@@ -38,8 +31,8 @@ EntityBehavior::spy_behavior(EntityTable& table,
           return EntityBehavior::move_to_nearest_enemy(
             table, center, sight_radius, n);
         } else {
-          return EntityBehavior::move_to_nearest_enemy(
-            table, center, sight_radius, n);
+          return EntityBehavior::move_to_nearest_of_type_enemy(
+            table, center, sight_radius, n, EntityType::Soldier);
         }
       }
 
@@ -52,8 +45,7 @@ EntityBehavior::spy_behavior(EntityTable& table,
         }
       }
 
-      return EntityBehavior::runaway_from_nearest_enemy(
-        table, center, sight_radius, n);
+      return EntityBehavior::runaway_move(table, center, sight_radius, n);
     } else {
       if (entity.state() == AbilityState::On) {
         return EntityBehavior::move_to_nearest_enemy(
@@ -133,15 +125,36 @@ EntityBehavior::random_move(EntityTable& table,
       if (p.first != center) {
         if (entity.team() == Team::Left) {
           if (p.first.x >= center.x) {
-            advancing_moves.push_back(p.first);
+            if (center.y >= table.get_dimensions().y / 2 &&
+                p.first.y <= center.y) {
+              advancing_moves.push_back(p.first);
+            } else if (center.y < table.get_dimensions().y / 2 &&
+                       p.first.y >= center.y) {
+              advancing_moves.push_back(p.first);
+            } else {
+              if (gen() % 1000 < 800) {
+                advancing_moves.push_back(p.first);
+              }
+            }
           }
         } else if (entity.team() == Team::Right) {
           if (p.first.x <= center.x) {
-            advancing_moves.push_back(p.first);
+            if (center.y >= table.get_dimensions().y / 2 &&
+                p.first.y <= center.y) {
+              advancing_moves.push_back(p.first);
+            } else if (center.y < table.get_dimensions().y / 2 &&
+                       p.first.y >= center.y) {
+              advancing_moves.push_back(p.first);
+            } else {
+              if (gen() % 1000 < 800) {
+                advancing_moves.push_back(p.first);
+              }
+            }
           }
         }
       }
     }
+
     if (advancing_moves.size() > 0) {
       return advancing_moves[gen() % advancing_moves.size()];
     } else {

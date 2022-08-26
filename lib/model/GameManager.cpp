@@ -116,6 +116,36 @@ GameManager::cleanup()
             default:
               break;
           }
+        } else if (_entity_table.get_entity(pos).type() ==
+                   EntityType::Soldier) {
+          switch (_entity_table.get_entity(pos).team()) {
+            case Team::Left:
+              if (pos.x >= _entity_table.get_dimensions().x - 4 &&
+                  (pos.y >= _entity_table.get_dimensions().y - 4 ||
+                   pos.y <= 3)) {
+                _entity_table.put_entity(
+                  pos, Entity(EntityType::Size, Team::Size, 0, 0, pos));
+                auto new_root_maybe = Tree::DeleteNode(_ordering, key_fn(pos));
+                if (new_root_maybe->parent() == nullptr) {
+                  _ordering = new_root_maybe;
+                }
+              }
+              break;
+            case Team::Right:
+              if (pos.x <= 3 &&
+                  (pos.y >= _entity_table.get_dimensions().y - 4 ||
+                   pos.y <= 3)) {
+                _entity_table.put_entity(
+                  pos, Entity(EntityType::Size, Team::Size, 0, 0, pos));
+                auto new_root_maybe = Tree::DeleteNode(_ordering, key_fn(pos));
+                if (new_root_maybe->parent() == nullptr) {
+                  _ordering = new_root_maybe;
+                }
+              }
+              break;
+            default:
+              break;
+          }
         }
       }
     }

@@ -31,6 +31,10 @@ main(int argc, char** argv)
   getmaxyx(stdscr, height, width);
 
   Window win(height, width, 0, 0);
+
+  win.add_border();
+  win.refresh();
+
   TableRender render;
 
   render.render(win, gm.grid(), Point2i(0, 0), gm.grid().get_dimensions());
