@@ -89,7 +89,11 @@ EntityBehavior::soldier_behavior(EntityTable& table,
           table, center, sight_radius, n);
       }
 
-      return EntityBehavior::runaway_move(table, center, sight_radius, n);
+      if (table.get_entity(center).has_stamina()) {
+        return center;
+      } else {
+        return EntityBehavior::runaway_move(table, center, sight_radius, n);
+      }
     } else {
       if (nearest_distance <= distance_threshold) {
         return EntityBehavior::move_to_nearest_enemy(

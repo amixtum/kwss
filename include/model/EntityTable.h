@@ -47,6 +47,8 @@ public:
 
   Entity get_entity(Point2i pos);
 
+  Point2i get_leader(Team team);
+
   bool has_entity(Point2i pos) const;
 
   Nbrs in_radius(Point2i center, int radius, Neighborhood n);

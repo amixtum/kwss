@@ -12,7 +12,7 @@
 
 using Symbol = std::pair<char, int>;
 
-using SymbolTable = std::array<std::array<Symbol, static_cast<int>(Team::Size)>,
+using SymbolTable = std::array<std::array<std::array<Symbol, static_cast<int>(AbilityState::Size)>, static_cast<int>(Team::Size)>,
                                static_cast<int>(EntityType::Size)>;
 
 class TableRender
@@ -27,7 +27,7 @@ public:
 
   Symbol symbol(Entity entity);
 
-  void set_symbol(EntityType type, Team team, Symbol sym);
+  void set_symbol(EntityType type, Team team, AbilityState state, Symbol sym);
 
 public:
   static Symbol default_symbol();

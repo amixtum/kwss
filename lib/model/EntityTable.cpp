@@ -110,6 +110,20 @@ EntityTable::get_entity(Point2i pos)
   return _grid[pos.x][pos.y];
 }
 
+Point2i 
+EntityTable::get_leader(Team team)
+{
+  switch (team)
+  {
+    case Team::Left:
+      return left_leader;
+    case Team::Right:
+      return right_leader;
+    default:
+      return Point2i(-1, -1);
+  }
+}
+
 bool
 EntityTable::has_entity(Point2i pos) const
 {

@@ -46,41 +46,60 @@ Window::add_char_at(Point2i at, unsigned char c)
 void
 Window::add_char_at_color(Point2i at, unsigned char c, int color)
 {
-  wmove(_win, at.y, at.x);
-
   init_pair(1, COLOR_RED, COLOR_BLACK);
   init_pair(2, COLOR_BLUE, COLOR_BLACK);
   init_pair(3, COLOR_GREEN, COLOR_BLACK);
   init_pair(4, COLOR_YELLOW, COLOR_BLACK);
-  init_pair(5, COLOR_WHITE, COLOR_BLACK);
+  init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
+  init_pair(6, COLOR_CYAN, COLOR_BLACK);
+  init_pair(7, COLOR_BLACK, COLOR_BLACK);
 
+
+  wmove(_win, at.y, at.x);
+/*
   switch (color) {
-    case 0:
+    case 1:
       wattron(_win, COLOR_PAIR(1));
       waddch(_win, c);
       wattroff(_win, COLOR_PAIR(1));
       break;
-    case 1:
+    case 2:
       wattron(_win, COLOR_PAIR(2));
       waddch(_win, c);
       wattroff(_win, COLOR_PAIR(2));
       break;
-    case 2:
+    case 3:
       wattron(_win, COLOR_PAIR(3));
       waddch(_win, c);
       wattroff(_win, COLOR_PAIR(3));
       break;
-    case 3:
+    case 4:
       wattron(_win, COLOR_PAIR(4));
       waddch(_win, c);
       wattroff(_win, COLOR_PAIR(4));
       break;
-    default:
+    case 5:
       wattron(_win, COLOR_PAIR(5));
       waddch(_win, c);
       wattroff(_win, COLOR_PAIR(5));
+    case 6:
+      wattron(_win, COLOR_PAIR(6));
+      waddch(_win, c);
+      wattroff(_win, COLOR_PAIR(6));
+    case 7:
+      wattron(_win, COLOR_PAIR(7));
+      waddch(_win, c);
+      wattroff(_win, COLOR_PAIR(7));
+    default:
+      wattron(_win, COLOR_PAIR(7));
+      waddch(_win, c);
+      wattroff(_win, COLOR_PAIR(7));
       break;
-  }
+  }*/
+
+  wattron(_win, COLOR_PAIR(color));
+  waddch(_win, c);
+  wattroff(_win, COLOR_PAIR(color));
 }
 
 void

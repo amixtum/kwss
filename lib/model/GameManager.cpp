@@ -94,7 +94,7 @@ GameManager::cleanup()
         if (_entity_table.get_entity(pos).type() == EntityType::Spy) {
           switch (_entity_table.get_entity(pos).team()) {
             case Team::Left:
-              if (pos.x >= _entity_table.get_dimensions().x - 4) {
+              if (pos.x >= _entity_table.get_dimensions().x - 1 - (_entity_table.get_dimensions().x / 4)) {
                 _entity_table.put_entity(
                   pos, Entity(EntityType::Size, Team::Size, 0, 0, pos));
                 auto new_root_maybe = Tree::DeleteNode(_ordering, key_fn(pos));
@@ -104,7 +104,7 @@ GameManager::cleanup()
               }
               break;
             case Team::Right:
-              if (pos.x < 3) {
+              if (pos.x <= _entity_table.get_dimensions().x / 4) {
                 _entity_table.put_entity(
                   pos, Entity(EntityType::Size, Team::Size, 0, 0, pos));
                 auto new_root_maybe = Tree::DeleteNode(_ordering, key_fn(pos));
@@ -159,15 +159,11 @@ GameManager::spawn_units()
   std::mt19937 gen(rd());
 
   for (int i = 0; i < _battle_table.get_wave_size(); i += 1) {
+    spawn(EntityType::Soldier, Team::Right);
     spawn(EntityType::Soldier, Team::Left);
 
-    spawn(EntityType::Soldier, Team::Right);
-
-    if (gen() % 1000 < 500) {
-      spawn(EntityType::Spy, Team::Left);
-
-      spawn(EntityType::Spy, Team::Right);
-    }
+    spawn(EntityType::Spy, Team::Right);
+    spawn(EntityType::Spy, Team::Left);
   }
 
   _spawner.finish(Team::Left);
@@ -190,7 +186,9 @@ GameManager::move_entities()
   auto key_fn = [](Point2i p) { return p.x * p.y + p.x; };
 
   std::vector<Node> random_traverse;
-  Tree::RandomTraverse(_ordering, random_traverse);
+  Tree::Inorder(_ordering, random_traverse);
+  auto rng = std::default_random_engine {};
+  std::shuffle(std::begin(random_traverse), std::end(random_traverse), rng);
 
   for (auto& node : random_traverse) {
     auto center = node->value().position();
@@ -241,10 +239,6 @@ GameManager::move_entities()
         _battle_table.get_sight_radius(EntityType::Soldier),
         Neighborhood::Moore,
         _battle_table.get_distance_threshold(EntityType::Soldier));
-    } else {
-      DebugLog logger;
-      logger.write(entity.to_string());
-      logger.write("\n");
     }
 
     // computed an activate ability/wait
@@ -268,9 +262,11 @@ GameManager::move_entities()
       // battle
       _entity_table.battle(center, next_pos);
 
-      if (_entity_table.get_entity(next_pos).type() == EntityType::Leader) {
+      if (_entity_table.get_entity(next_pos).type() == EntityType::Leader ||
+          (_entity_table.get_entity(next_pos).type() == EntityType::Soldier &&
+           _entity_table.get_entity(next_pos).state() == AbilityState::On)) {
         _entity_table.battle(next_pos, center);
-      }
+      } 
 
       auto attacker = _entity_table.get_entity(center);
       auto defender = _entity_table.get_entity(next_pos);

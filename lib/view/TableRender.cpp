@@ -9,31 +9,43 @@ TableRender::TableRender()
   char soldier = '%';
   char spy = '$';
   char leader = '@';
-  char wall = '^';
+  char wall = '|';
 
-  auto sol_left = std::make_pair(soldier, 0);
-  auto sol_right = std::make_pair(soldier, 1);
+  auto sol_left = std::make_pair(soldier, 1);
+  auto sol_left_on = std::make_pair(soldier, 5);
+  auto sol_right = std::make_pair(soldier, 2);
+  auto sol_right_on = std::make_pair(soldier, 6);
 
-  auto spy_left = std::make_pair(spy, 0);
-  auto spy_right = std::make_pair(spy, 1);
+  auto spy_left = std::make_pair(spy, 5);
+  auto spy_left_on = std::make_pair(spy, 5);
+  auto spy_right = std::make_pair(spy, 6);
+  auto spy_right_on = std::make_pair(spy, 6);
 
-  auto leader_left = std::make_pair(leader, 0);
-  auto leader_right = std::make_pair(leader, 1);
+  auto leader_left = std::make_pair(leader, 1);
+  auto leader_right = std::make_pair(leader, 2);
 
-  auto wall_left = std::make_pair(wall, 2);
+  auto wall_left = std::make_pair(wall, 3);
   auto wall_right = std::make_pair(wall, 3);
 
-  set_symbol(EntityType::Soldier, Team::Left, sol_left);
-  set_symbol(EntityType::Soldier, Team::Right, sol_right);
+  set_symbol(EntityType::Soldier, Team::Left, AbilityState::Off, sol_left);
+  set_symbol(EntityType::Soldier, Team::Right, AbilityState::Off, sol_right);
+  set_symbol(EntityType::Soldier, Team::Left, AbilityState::On, sol_left_on);
+  set_symbol(EntityType::Soldier, Team::Right, AbilityState::On, sol_right_on);
 
-  set_symbol(EntityType::Spy, Team::Left, spy_left);
-  set_symbol(EntityType::Spy, Team::Right, spy_right);
+  set_symbol(EntityType::Spy, Team::Left, AbilityState::Off, spy_left);
+  set_symbol(EntityType::Spy, Team::Right, AbilityState::Off, spy_right);
+  set_symbol(EntityType::Spy, Team::Left, AbilityState::On, spy_left_on);
+  set_symbol(EntityType::Spy, Team::Right, AbilityState::On, spy_right_on);
 
-  set_symbol(EntityType::Leader, Team::Left, leader_left);
-  set_symbol(EntityType::Leader, Team::Right, leader_right);
+  set_symbol(EntityType::Leader, Team::Left, AbilityState::Off, leader_left);
+  set_symbol(EntityType::Leader, Team::Right, AbilityState::Off, leader_right);
+  set_symbol(EntityType::Leader, Team::Left, AbilityState::On, leader_left);
+  set_symbol(EntityType::Leader, Team::Right, AbilityState::On, leader_right);
 
-  set_symbol(EntityType::Wall, Team::Left, wall_left);
-  set_symbol(EntityType::Wall, Team::Right, wall_right);
+  set_symbol(EntityType::Wall, Team::Left, AbilityState::Off, wall_left);
+  set_symbol(EntityType::Wall, Team::Right, AbilityState::Off, wall_right);
+  set_symbol(EntityType::Wall, Team::Left, AbilityState::On, wall_left);
+  set_symbol(EntityType::Wall, Team::Right, AbilityState::On, wall_right);
 }
 
 void
@@ -83,20 +95,20 @@ TableRender::symbol(Entity entity)
   auto team = entity.team();
 
   if (team == Team::Size) {
-    team = (gen() % 1000 < 500) ? Team::Left : Team::Right;
+    team = Team::Left;
   }
 
-  return _symbols[static_cast<int>(entity.type())][static_cast<int>(team)];
+  return _symbols[static_cast<int>(entity.type())][static_cast<int>(team)][static_cast<int>(entity.state())];
 }
 
 void
-TableRender::set_symbol(EntityType type, Team team, Symbol sym)
+TableRender::set_symbol(EntityType type, Team team, AbilityState state, Symbol sym)
 {
-  _symbols[static_cast<int>(type)][static_cast<int>(team)] = sym;
+  _symbols[static_cast<int>(type)][static_cast<int>(team)][static_cast<int>(state)] = sym;
 }
 
 Symbol
 TableRender::default_symbol()
 {
-  return std::make_pair('.', COLOR_WHITE);
+  return std::make_pair('.', 7);
 }

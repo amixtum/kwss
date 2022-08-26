@@ -1,14 +1,15 @@
-Dimensions 80 20
+Dimensions 128 16
 #
-Respawn 10 1 2
+Respawn 2 1 1
 #
-WallFactor 5
+WallFactor 8
 #
 MaxValues
-Soldier 3 2 3 1.5
-Spy 1 2 4 2
-Wall 4 0 0 0
-Leader 10 0 0 0
+# EntityType HP Stamina SightRadius ActivationThreshold
+Soldier 2 2 2 1.5
+Spy 1 10 3 2
+Wall 1 0 0 0
+Leader 16 0 0 0
 #
 DmgValues
 Soldier Soldier Off Off 2
@@ -46,10 +47,10 @@ Spy Leader Off On 0
 Spy Leader On Off 0
 Spy Leader On On 0
 #
-Leader Soldier Off Off 2
-Leader Soldier Off On 1
-Leader Soldier On Off 2
-Leader Soldier On On 1
+Leader Soldier Off Off 128
+Leader Soldier Off On 2
+Leader Soldier On Off 128
+Leader Soldier On On 2
 #
 Soldier Leader Off Off 1
 Soldier Leader Off On 1

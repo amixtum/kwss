@@ -13,10 +13,19 @@
 int
 main(int argc, char** argv)
 {
-  GameManager gm("/home/gani/src/kwss/data/properties.txt");
+  if (argc != 2) {
+    std::cout << "Usage: KWSS <path to properties file>\n";
+    return -1;
+  }
+
+  GameManager gm(argv[1]);
+
 
   // call this before using ncurses
   initscr();
+
+  // no cursor
+  curs_set(0);
 
   // get single characters e.g. dont wait for enter key
   cbreak();
@@ -44,39 +53,39 @@ main(int argc, char** argv)
   int left_wins = 0;
   int right_wins = 0;
 
-  for (int i = 0; i < 100; i += 1) {
-    while (gm.tick()) {
-      render.render(win, gm.grid(), Point2i(0, 0), gm.grid().get_dimensions());
-      win.refresh();
-      // wait for a keypress
-      // wgetch(win.ptr());
-    }
-    if (gm.winner() == Team::Left) {
-      left_wins += 1;
-    } else {
-      right_wins += 1;
-    }
+  std::string current_score;
 
-    gm.reset();
+  while (gm.tick()) {
+    render.render(win, gm.grid(), Point2i(0, 0), gm.grid().get_dimensions());
+    win.refresh();
 
-    std::string winner;
-    winner.append("Left wins: ");
-    winner.append(std::to_string(left_wins));
-    winner.append(", Right Wins: ");
-    winner.append(std::to_string(right_wins));
+    // wait for a keypress
+    // wgetch(win.ptr());
 
-    wmove(win.ptr(), height / 2, width / 2);
-    waddstr(win.ptr(), winner.c_str());
+    current_score.append("Left HP: ");
+    current_score.append(std::to_string(gm.grid().get_entity(gm.grid().get_leader(Team::Left)).hp()));
+    current_score.append(", ");
+    current_score.append("Right HP: ");
+    current_score.append(std::to_string(gm.grid().get_entity(gm.grid().get_leader(Team::Right)).hp()));
+    wmove(win.ptr(), (height / 2) + (height / 4), (width / 2) + (width / 4));
+    waddstr(win.ptr(), current_score.c_str());
+    win.refresh();
+    current_score.clear();
   }
 
   std::string winner;
-  winner.append("Left wins: ");
-  winner.append(std::to_string(left_wins));
-  winner.append(", Right Wins: ");
-  winner.append(std::to_string(right_wins));
+  if (gm.winner() == Team::Left) {
+    winner = "Left Wins";
+  } else {
+    winner = "Right Wins";
+  }
+
+  winner.append(". Press q to quit");
 
   wmove(win.ptr(), height / 2, width / 2);
   waddstr(win.ptr(), winner.c_str());
+
+  win.refresh();
 
   while (wgetch(win.ptr()) != 'q') {
   }
