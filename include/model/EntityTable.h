@@ -2,6 +2,7 @@
 #define ENTITY_TABLE_H_
 
 #include <algorithm>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -29,6 +30,8 @@ public:
 
 public:
   EntityTable(BattleTable* battle_table);
+
+  void reset();
 
   void battle(Point2i attacker, Point2i defender);
 
@@ -67,6 +70,13 @@ public:
   Nbrs empty_in_radius(Point2i center, int radius, Neighborhood n);
 
 private:
+  void in_radius_helper(Point2i center,
+                        int radius,
+                        Nbrs& to_fill,
+                        Neighborhood n,
+                        std::function<bool(Entity)> insert_fn,
+                        Point2i exclude);
+
   void in_radius_helper(Point2i center,
                         int radius,
                         Nbrs& to_fill,

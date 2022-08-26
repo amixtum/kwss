@@ -1,12 +1,12 @@
-Dimensions 80 20
+Dimensions 100 20
 #
-Respawn 10 1 2
+Respawn 10 1 1
 #
-WallFactor 5
+WallFactor 4
 #
 MaxValues
-Soldier 3 2 4 1.5
-Spy 1 3 5 2
+Soldier 2 4 3 2
+Spy 1 5 3 3
 Wall 4 0 0 0
 Leader 10 0 0 0
 #

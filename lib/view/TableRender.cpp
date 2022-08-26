@@ -83,7 +83,7 @@ TableRender::symbol(Entity entity)
   auto team = entity.team();
 
   if (team == Team::Size) {
-    team = (gen() % 255 < 127) ? Team::Left : Team::Right;
+    team = (gen() % 1000 < 500) ? Team::Left : Team::Right;
   }
 
   return _symbols[static_cast<int>(entity.type())][static_cast<int>(team)];

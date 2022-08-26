@@ -81,7 +81,7 @@ EntitySpawner::spawn_helper(EntityType type,
   int mid = (gen() % (bottom_y - top_y)) + top_y;
 
   if (_entity_table->has_entity(Point2i(x, mid))) {
-    if (gen() % 255 < 127) {
+    if (gen() % 1000 < 500) {
       return EntitySpawner::spawn_helper(type, team, x, top_y, mid);
     }
 

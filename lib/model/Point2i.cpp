@@ -89,6 +89,12 @@ Point2i::operator==(const Point2i& rhs) const
 }
 
 bool
+Point2i::operator!=(const Point2i& rhs) const
+{
+  return x != rhs.x || y != rhs.y;
+}
+
+bool
 Point2i::operator<(const Point2i& rhs) const
 {
   return (x * y) + x < (rhs.x * rhs.y) + rhs.x;

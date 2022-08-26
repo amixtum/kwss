@@ -619,7 +619,7 @@ BinarySearchTree<K, V>::RandomTraverse(Node root, std::vector<Node>& nodes)
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  auto left_first = gen() % 255 < 127;
+  auto left_first = gen() % 1000 < 500;
 
   if (left_first) {
     BinarySearchTree<K, V>::RandomTraverse(root->left(), nodes);

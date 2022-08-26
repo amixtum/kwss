@@ -29,6 +29,8 @@ struct Point2i
 
   bool operator==(const Point2i& rhs) const;
 
+  bool operator!=(const Point2i& rhs) const;
+
   bool operator<(const Point2i& rhs) const;
 
   int x = 0;

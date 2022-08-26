@@ -15,7 +15,7 @@ public:
 
 private:
   std::ofstream file;
-  std::string filename = "/home/ganiparrott/src/projects/kwss/log/log.txt";
+  std::string filename = "/home/gani/src/kwss/log/log.txt";
 };
 
 #endif // DebugLog.h included

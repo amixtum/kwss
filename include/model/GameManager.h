@@ -18,6 +18,8 @@ class GameManager
 public:
   GameManager(std::string pfile);
 
+  void reset();
+
   bool tick();
 
   Team winner();
@@ -26,6 +28,8 @@ public:
 
 private:
   void setup();
+
+  void cleanup();
 
   void spawn_units();
 

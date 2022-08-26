@@ -2,6 +2,7 @@
 #define ENTITY_H_
 
 #include <memory>
+#include <string>
 
 #include "AbilityState.h"
 #include "EntityType.h"
@@ -31,6 +32,8 @@ public:
 
   bool has_stamina() const;
 
+  void set_type(EntityType type);
+
   void set_team(Team team);
 
   void set_hp(int hp);
@@ -48,6 +51,8 @@ public:
   void set_position(Point2i pos);
 
   Entity& operator=(const Entity& other);
+
+  std::string to_string();
 
 protected:
   Team _team;

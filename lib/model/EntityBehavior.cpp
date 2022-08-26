@@ -16,56 +16,59 @@ EntityBehavior::spy_behavior(EntityTable& table,
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  if (true) {
-    auto entity = table.get_entity(center);
-    if (entity.type() != EntityType::Spy) {
-      logger.write("Wrong entity type in spy_behavior at position ");
-      logger.write(center.to_string());
-      logger.write("\n");
-    }
+  auto entity = table.get_entity(center);
+  if (entity.type() != EntityType::Spy) {
+    logger.write("Wrong entity type in spy_behavior at position ");
+    logger.write(center.to_string());
+    logger.write("\n");
+  }
 
-    auto enemies = EntityBehavior::count_enemy(table, center, sight_radius, n);
+  auto enemies = EntityBehavior::count_enemy(table, center, sight_radius, n);
 
-    if (enemies != 0) {
-      auto friendly =
-        EntityBehavior::count_friendly(table, center, sight_radius, n);
+  if (enemies != 0) {
+    auto friendly =
+      EntityBehavior::count_friendly(table, center, sight_radius, n);
 
-      auto nearest_distance =
-        EntityBehavior::nearest_enemy_distance(table, center, sight_radius, n);
+    auto nearest_distance =
+      EntityBehavior::nearest_enemy_distance(table, center, sight_radius, n);
 
-      if (friendly < enemies) {
-        if (entity.state() == AbilityState::On) {
-          if (nearest_distance < distance_threshold) {
-            return EntityBehavior::move_to_nearest_enemy(
-              table, center, sight_radius, n);
-          } else {
-            return EntityBehavior::attack_move(table, center, sight_radius, n);
-          }
-        }
-
-        if (nearest_distance < distance_threshold) {
-          return center;
-        }
-
-        return EntityBehavior::runaway_move(table, center, sight_radius, n);
-      } else {
-        if (entity.state() == AbilityState::On) {
+    if (friendly <= enemies - 1) {
+      if (entity.state() == AbilityState::On) {
+        if (nearest_distance <= distance_threshold) {
           return EntityBehavior::move_to_nearest_enemy(
             table, center, sight_radius, n);
         } else {
-          if (nearest_distance < distance_threshold) {
-            return EntityBehavior::runaway_from_nearest_enemy(
-              table, center, sight_radius, n);
-          } else {
-            return center;
-          }
+          return EntityBehavior::move_to_nearest_enemy(
+            table, center, sight_radius, n);
         }
       }
+
+      if (nearest_distance <= distance_threshold) {
+        if (table.get_entity(center).has_stamina()) {
+          return center;
+        } else {
+          return EntityBehavior::runaway_from_nearest_enemy(
+            table, center, sight_radius, n);
+        }
+      }
+
+      return EntityBehavior::runaway_from_nearest_enemy(
+        table, center, sight_radius, n);
     } else {
-      return EntityBehavior::random_move(table, center, sight_radius, n);
+      if (entity.state() == AbilityState::On) {
+        return EntityBehavior::move_to_nearest_enemy(
+          table, center, sight_radius, n);
+      } else {
+        if (nearest_distance <= distance_threshold) {
+          return EntityBehavior::move_to_nearest_of_type_enemy(
+            table, center, sight_radius, n, EntityType::Spy);
+        } else {
+          return EntityBehavior::attack_move(table, center, sight_radius, n);
+        }
+      }
     }
   } else {
-    return Point2i(-1, -1);
+    return EntityBehavior::random_move(table, center, sight_radius, n);
   }
 }
 
@@ -79,35 +82,36 @@ EntityBehavior::soldier_behavior(EntityTable& table,
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  if (true) {
-    auto enemies = EntityBehavior::count_enemy(table, center, sight_radius, n);
+  auto enemies = EntityBehavior::count_enemy(table, center, sight_radius, n);
 
-    if (enemies != 0) {
-      auto friendly =
-        EntityBehavior::count_friendly(table, center, sight_radius, n);
+  if (enemies != 0) {
+    auto friendly =
+      EntityBehavior::count_friendly(table, center, sight_radius, n);
 
-      auto nearest_distance =
-        EntityBehavior::nearest_enemy_distance(table, center, sight_radius, n);
+    auto nearest_distance =
+      EntityBehavior::nearest_enemy_distance(table, center, sight_radius, n);
 
-      if (friendly < enemies) {
-        if (nearest_distance < distance_threshold) {
-          return EntityBehavior::runaway_move(table, center, sight_radius, n);
-        }
+    if (friendly <= enemies - 1) {
+      if (nearest_distance <= distance_threshold) {
+        return EntityBehavior::runaway_from_nearest_enemy(
+          table, center, sight_radius, n);
+      }
 
+      if (table.get_entity(center).has_stamina()) {
         return center;
       } else {
-        if (nearest_distance < distance_threshold) {
-          return EntityBehavior::move_to_nearest_enemy(
-            table, center, sight_radius, n);
-        }
-
-        return EntityBehavior::attack_move(table, center, sight_radius, n);
+        return EntityBehavior::runaway_move(table, center, sight_radius, n);
       }
     } else {
-      return EntityBehavior::random_move(table, center, sight_radius, n);
+      if (nearest_distance <= distance_threshold) {
+        return EntityBehavior::move_to_nearest_enemy(
+          table, center, sight_radius, n);
+      }
+
+      return EntityBehavior::attack_move(table, center, sight_radius, n);
     }
   } else {
-    return Point2i(-1, -1);
+    return EntityBehavior::random_move(table, center, sight_radius, n);
   }
 }
 
@@ -117,6 +121,7 @@ EntityBehavior::random_move(EntityTable& table,
                             int sight_radius,
                             Neighborhood n)
 {
+
   std::random_device rd;
   std::mt19937 gen(rd());
   auto entity = table.get_entity(center);
@@ -124,20 +129,19 @@ EntityBehavior::random_move(EntityTable& table,
 
   if (valid_moves.size() > 0) {
     std::vector<Point2i> advancing_moves;
-    if (entity.team() == Team::Left) {
-      for (auto& p : valid_moves) {
-        if (p.first.x > center.x) {
-          advancing_moves.push_back(p.first);
-        }
-      }
-    } else if (entity.team() == Team::Right) {
-      for (auto& p : valid_moves) {
-        if (p.first.x < center.x) {
-          advancing_moves.push_back(p.first);
+    for (auto& p : valid_moves) {
+      if (p.first != center) {
+        if (entity.team() == Team::Left) {
+          if (p.first.x >= center.x) {
+            advancing_moves.push_back(p.first);
+          }
+        } else if (entity.team() == Team::Right) {
+          if (p.first.x <= center.x) {
+            advancing_moves.push_back(p.first);
+          }
         }
       }
     }
-
     if (advancing_moves.size() > 0) {
       return advancing_moves[gen() % advancing_moves.size()];
     } else {
@@ -146,9 +150,13 @@ EntityBehavior::random_move(EntityTable& table,
       return iter->first;
     }
   } else {
-    auto try_wall = EntityBehavior::move_to_nearest_of_type(
-      table, center, sight_radius, n, EntityType::Wall);
-    return try_wall;
+    if (table.get_entity(center).type() == EntityType::Soldier) {
+      auto try_wall = EntityBehavior::move_to_nearest_of_type(
+        table, center, sight_radius, n, EntityType::Wall);
+      return try_wall;
+    } else {
+      return center;
+    }
   }
 }
 

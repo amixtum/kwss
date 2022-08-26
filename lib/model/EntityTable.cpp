@@ -1,6 +1,7 @@
 #include "../../include/model/EntityTable.h"
 #include "../../include/model/AbilityState.h"
 #include "../../include/model/EntityType.h"
+#include "../../include/util/DebugLog.h"
 
 #include <map>
 
@@ -22,6 +23,19 @@ EntityTable::EntityTable(BattleTable* battle_table)
 }
 
 void
+EntityTable::reset()
+{
+  for (auto i = 0; i < _dimensions.x; i += 1) {
+    for (auto k = 0; k < _dimensions.y; k += 1) {
+      auto blank = Entity(EntityType::Size, Team::Size, 0, 0, Point2i(i, k));
+      put_entity(Point2i(i, k), blank);
+    }
+  }
+  left_leader = Point2i(-1, -1);
+  right_leader = Point2i(-1, -1);
+}
+
+void
 EntityTable::battle(Point2i attacker, Point2i defender)
 {
   auto new_entities =
@@ -33,9 +47,11 @@ EntityTable::battle(Point2i attacker, Point2i defender)
 Team
 EntityTable::get_winner()
 {
-  if (!get_entity(left_leader).alive()) {
+  if (!get_entity(left_leader).alive() ||
+      get_entity(left_leader).type() != EntityType::Leader) {
     return Team::Right;
-  } else if (!get_entity(right_leader).alive()) {
+  } else if (!get_entity(right_leader).alive() ||
+             get_entity(left_leader).type() != EntityType::Leader) {
     return Team::Left;
   }
 
@@ -75,9 +91,15 @@ EntityTable::put_entity(Point2i pos, EntityType type, Team team)
 Entity
 EntityTable::put_entity(Point2i pos, Entity entity)
 {
-  _grid[pos.x][pos.y] = entity;
+  auto e = get_entity(pos);
+  e.set_ability_state(AbilityState::Off);
+  e.set_type(entity.type());
+  e.set_team(entity.team());
+  e.set_hp(entity.hp());
+  e.set_stamina(entity.stamina());
+  e.set_position(pos);
 
-  entity.set_position(pos);
+  _grid[pos.x][pos.y] = e;
 
   return _grid[pos.x][pos.y];
 }
@@ -97,9 +119,9 @@ EntityTable::has_entity(Point2i pos) const
 void
 EntityTable::move_entity(Point2i from, Point2i to)
 {
-  _grid[to.x][to.y] = _grid[from.x][from.y];
-  _grid[from.x][from.y] = Entity(EntityType::Size, Team::Size, 0, 0, from);
-  _grid[to.x][to.y].set_position(to);
+  auto blank = Entity(EntityType::Size, Team::Size, 0, 0, from);
+  put_entity(to, _grid[from.x][from.y]);
+  put_entity(from, blank);
 }
 
 std::map<Point2i, Entity, EntityTable::PointCompare>
@@ -209,6 +231,13 @@ EntityTable::in_radius_helper(Point2i center,
     return;
   }
 
+  auto insert_fn = [&](Entity e) {
+    return !(e.type() == EntityType::Spy && e.state() == AbilityState::On);
+  };
+
+  in_radius_helper(center, radius, to_fill, n, insert_fn, center);
+
+  /*
   for (auto& neighbor :
        neighbors(n, center, 0, 0, _dimensions.x - 1, _dimensions.y - 1)) {
     auto e_at = get_entity(neighbor);
@@ -225,6 +254,7 @@ EntityTable::in_radius_helper(Point2i center,
 
     in_radius_helper(neighbor, radius - 1, to_fill, n);
   }
+  */
 }
 
 void
@@ -238,6 +268,14 @@ EntityTable::in_radius_helper_type(Point2i center,
     return;
   }
 
+  auto insert_fn = [&](Entity e) {
+    return e.type() == type &&
+           !(e.type() == EntityType::Spy && e.state() == AbilityState::On);
+  };
+
+  in_radius_helper(center, radius, to_fill, n, insert_fn, center);
+
+  /*
   for (auto& neighbor :
        neighbors(n, center, 0, 0, _dimensions.x - 1, _dimensions.y - 1)) {
     auto e_at = get_entity(neighbor);
@@ -256,6 +294,7 @@ EntityTable::in_radius_helper_type(Point2i center,
 
     in_radius_helper_type(neighbor, radius - 1, to_fill, type, n);
   }
+  */
 }
 
 void
@@ -269,6 +308,14 @@ EntityTable::enemies_in_radius_helper(Point2i center,
     return;
   }
 
+  auto insert_fn = [&](Entity e) {
+    return e.team() != team && e.team() != Team::Size &&
+           !(e.type() == EntityType::Spy && e.state() == AbilityState::On);
+  };
+
+  in_radius_helper(center, radius, to_fill, n, insert_fn, center);
+
+  /*
   for (auto& neighbor :
        neighbors(n, center, 0, 0, _dimensions.x - 1, _dimensions.y - 1)) {
     auto e_at = get_entity(neighbor);
@@ -285,6 +332,7 @@ EntityTable::enemies_in_radius_helper(Point2i center,
 
     enemies_in_radius_helper(neighbor, radius - 1, to_fill, team, n);
   }
+  */
 }
 
 void
@@ -298,6 +346,11 @@ EntityTable::friendly_in_radius_helper(Point2i center,
     return;
   }
 
+  auto insert_fn = [&](Entity e) { return e.team() == team; };
+
+  in_radius_helper(center, radius, to_fill, n, insert_fn, center);
+
+  /*
   for (auto& neighbor :
        neighbors(n, center, 0, 0, _dimensions.x - 1, _dimensions.y - 1)) {
     auto e_at = get_entity(neighbor);
@@ -312,6 +365,7 @@ EntityTable::friendly_in_radius_helper(Point2i center,
 
     friendly_in_radius_helper(neighbor, radius - 1, to_fill, team, n);
   }
+  */
 }
 
 void
@@ -322,10 +376,18 @@ EntityTable::enemies_in_radius_helper_type(Point2i center,
                                            EntityType type,
                                            Neighborhood n)
 {
-  if (radius == 0) {
+  if (radius <= 0) {
     return;
   }
 
+  auto insert_fn = [&](Entity e) {
+    return e.team() != team && e.type() == type && e.team() != Team::Size &&
+           !(e.type() == EntityType::Spy && e.state() == AbilityState::On);
+  };
+
+  in_radius_helper(center, radius, to_fill, n, insert_fn, center);
+
+  /*
   for (auto& neighbor :
        neighbors(n, center, 0, 0, _dimensions.x - 1, _dimensions.y - 1)) {
     auto e_at = get_entity(neighbor);
@@ -344,6 +406,7 @@ EntityTable::enemies_in_radius_helper_type(Point2i center,
 
     enemies_in_radius_helper_type(neighbor, radius - 1, to_fill, team, type, n);
   }
+  */
 }
 
 void
@@ -354,10 +417,17 @@ EntityTable::friendly_in_radius_helper_type(Point2i center,
                                             EntityType type,
                                             Neighborhood n)
 {
-  if (radius == 0) {
+  if (radius <= 0) {
     return;
   }
 
+  auto insert_fn = [&](Entity e) {
+    return e.team() == team && e.type() == type;
+  };
+
+  in_radius_helper(center, radius, to_fill, n, insert_fn, center);
+
+  /*
   for (auto& neighbor :
        neighbors(n, center, 0, 0, _dimensions.x - 1, _dimensions.y - 1)) {
     auto e_at = get_entity(neighbor);
@@ -374,6 +444,7 @@ EntityTable::friendly_in_radius_helper_type(Point2i center,
     friendly_in_radius_helper_type(
       neighbor, radius - 1, to_fill, team, type, n);
   }
+  */
 }
 
 void
@@ -382,10 +453,15 @@ EntityTable::empty_in_radius_helper(Point2i center,
                                     Nbrs& to_fill,
                                     Neighborhood n)
 {
-  if (radius == 0) {
+  if (radius <= 0) {
     return;
   }
 
+  auto insert_fn = [&](Entity e) { return e.type() == EntityType::Size; };
+
+  in_radius_helper(center, radius, to_fill, n, insert_fn, center);
+
+  /*
   for (auto& neighbor :
        neighbors(n, center, 0, 0, _dimensions.x - 1, _dimensions.y - 1)) {
     auto e_at = get_entity(neighbor);
@@ -393,12 +469,45 @@ EntityTable::empty_in_radius_helper(Point2i center,
     if (e_at.type() == EntityType::Wall) {
       continue;
     } else if (e_at.type() != EntityType::Size) {
-      in_radius_helper(neighbor, radius - 1, to_fill, n);
+      empty_in_radius_helper(neighbor, radius - 1, to_fill, n);
       continue;
     }
 
     to_fill.insert({ neighbor, e_at });
-    in_radius_helper(neighbor, radius - 1, to_fill, n);
+    empty_in_radius_helper(neighbor, radius - 1, to_fill, n);
+  }*/
+}
+
+void
+EntityTable::in_radius_helper(Point2i center,
+                              int radius,
+                              Nbrs& to_fill,
+                              Neighborhood n,
+                              std::function<bool(Entity)> insert_fn,
+                              Point2i exclude)
+{
+  if (radius <= 0) {
+    return;
+  }
+
+  for (auto& neighbor :
+       neighbors(n, center, 0, 0, _dimensions.x - 1, _dimensions.y - 1)) {
+    if (neighbor == exclude) {
+      in_radius_helper(neighbor, radius - 1, to_fill, n, insert_fn, exclude);
+      continue;
+    }
+
+    auto e_at = get_entity(neighbor);
+
+    if (insert_fn(e_at)) {
+      to_fill.insert({ neighbor, e_at });
+      in_radius_helper(neighbor, radius - 1, to_fill, n, insert_fn, exclude);
+      continue;
+    } else if (e_at.type() == EntityType::Wall) {
+      continue;
+    }
+
+    in_radius_helper(neighbor, radius - 1, to_fill, n, insert_fn, exclude);
   }
 }
 
