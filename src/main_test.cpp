@@ -3,16 +3,16 @@
 
 #include <ncurses.h>
 
-#include "../include/view/Window.h"
 #include "../include/view/TableRender.h"
+#include "../include/view/Window.h"
 
 #include "../include/model/GameManager.h"
 
 int
 main(int argc, char** argv)
 {
-  GameManager gm("/home/ganiparrott/src/projects/kwss/data/properties.txt");
-  
+  GameManager gm("/home/gani/src/kwss/data/properties.txt");
+
   // call this before using ncurses
   initscr();
 

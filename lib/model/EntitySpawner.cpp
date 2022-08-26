@@ -35,7 +35,7 @@ EntitySpawner::spawn(EntityType type, Team team, int attempts)
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  // if we're spawning a Wall make sure it doesn't interfere with 
+  // if we're spawning a Wall make sure it doesn't interfere with
   // Soldier or Spy spawns
   int x = (gen() % (_entity_table->get_dimensions().x - 10) + 5);
   if (team == Team::Left) {

@@ -1,7 +1,7 @@
 #include "../../include/view/TableRender.h"
 
-#include <random>
 #include <iostream>
+#include <random>
 
 TableRender::TableRender()
 {
@@ -36,28 +36,24 @@ TableRender::TableRender()
   set_symbol(EntityType::Wall, Team::Right, wall_right);
 }
 
-void 
+void
 TableRender::render(Window& window,
-                    EntityTable& table, 
-                    Point2i top_left, 
+                    EntityTable& table,
+                    Point2i top_left,
                     Point2i bottom_right)
 {
-  if (top_left.x < 0 || 
-      top_left.y < 0 ||
+  if (top_left.x < 0 || top_left.y < 0 ||
       top_left.x >= table.get_dimensions().x ||
-      top_left.y >= table.get_dimensions().y ||
-      bottom_right.x < 0 || 
-      bottom_right.y < 0 ||
-      bottom_right.x > table.get_dimensions().x ||
+      top_left.y >= table.get_dimensions().y || bottom_right.x < 0 ||
+      bottom_right.y < 0 || bottom_right.x > table.get_dimensions().x ||
       bottom_right.y > table.get_dimensions().y ||
-      top_left.x >= bottom_right.x ||
-      top_left.y >= bottom_right.y ||
+      top_left.x >= bottom_right.x || top_left.y >= bottom_right.y ||
       (bottom_right.x - top_left.x) > window.size().x ||
       (bottom_right.y - top_left.y) > window.size().y) {
     std::cout << window.size().x << " " << window.size().y << "\n";
     return;
   }
-  
+
   int w_x = 0;
   int w_y = 0;
   for (int x = top_left.x; x < bottom_right.x; x += 1) {
@@ -75,7 +71,7 @@ TableRender::render(Window& window,
 }
 
 Symbol
-TableRender::symbol(Entity &entity)
+TableRender::symbol(Entity entity)
 {
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -84,16 +80,16 @@ TableRender::symbol(Entity &entity)
     return TableRender::default_symbol();
   }
 
-  auto team = entity.team(); 
+  auto team = entity.team();
 
   if (team == Team::Size) {
     team = (gen() % 255 < 127) ? Team::Left : Team::Right;
-  } 
+  }
 
   return _symbols[static_cast<int>(entity.type())][static_cast<int>(team)];
 }
 
-void 
+void
 TableRender::set_symbol(EntityType type, Team team, Symbol sym)
 {
   _symbols[static_cast<int>(type)][static_cast<int>(team)] = sym;

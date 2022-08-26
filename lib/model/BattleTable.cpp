@@ -4,36 +4,53 @@
 
 BattleTable::BattleTable()
 {
-  auto basic_attack = [this](Entity& att, Entity& def) {
-    def.add_hp(-get_dmg(att, def));
+  auto basic_attack = [this](Entity att, Entity def) {
+    auto def_c = def;
+    def_c.add_hp(-get_dmg(att, def));
+    return std::make_pair(att, def_c);
   };
 
-  auto basic_attack_reverse = [this](Entity& att, Entity& def) {
-    att.add_hp(-get_dmg(def, att));
+  auto basic_attack_reverse = [this](Entity att, Entity def) {
+    auto att_c = att;
+    att_c.add_hp(-get_dmg(def, att));
+    return std::make_pair(att_c, def);
   };
 
-  auto uncloak_spy_def = [](Entity&, Entity& def) {
-    def.set_ability_state(AbilityState::Off);
+  auto uncloak_spy_def = [](Entity att, Entity def) {
+    auto def_c = def;
+    def_c.set_ability_state(AbilityState::Off);
+    return std::make_pair(att, def_c);
   };
 
-  auto uncloak_spy_att = [](Entity& att, Entity&) {
-    att.set_ability_state(AbilityState::Off);
+  auto uncloak_spy_att = [](Entity att, Entity def) {
+    auto att_c = att;
+    att_c.set_ability_state(AbilityState::Off);
+    return std::make_pair(att_c, def);
   };
 
-  auto try_turn_def = [this](Entity& att, Entity& def) {
+  auto try_turn_def = [this](Entity att, Entity def) {
     std::random_device rd;
     std::mt19937 gen(rd());
 
-    // in the case of spy vs. spy get_dmg is in [0, 100]
+    auto def_c = def;
+    // in the case of spy vs-> spy get_dmg is in [0, 100]
     // which represents the probability of turning another spy
     if (static_cast<int>(gen() % 100) < get_dmg(att, def)) {
-      def.set_team(att.team());
+      def_c.set_team(att.team());
     }
+
+    return std::make_pair(att, def_c);
   };
 
-  auto turn_def = [](Entity& att, Entity& def) { def.set_team(att.team()); };
+  auto turn_def = [](Entity att, Entity def) {
+    auto def_c = def;
+    def_c.set_team(att.team());
+    return std::make_pair(att, def_c);
+  };
 
-  auto nothing = [](Entity&, Entity&) { return; };
+  auto nothing = [](Entity att, Entity def) {
+    return std::make_pair(att, def);
+  };
 
   set_fn(EntityType::Soldier,
          EntityType::Soldier,
@@ -413,7 +430,7 @@ BattleTable::set_fn(EntityType attack_type,
                     EntityType defend_type,
                     AbilityState attack_state,
                     AbilityState defend_state,
-                    std::function<void(Entity&, Entity&)> fn)
+                    Fn fn)
 {
   _fn_table[static_cast<int>(attack_type)][static_cast<int>(defend_type)]
            [static_cast<int>(attack_state)][static_cast<int>(defend_state)] =
@@ -480,14 +497,14 @@ BattleTable::set_wave_size(int n)
   _wave_size = n;
 }
 
-void 
+void
 BattleTable::set_wall_factor(float n)
 {
   _wall_factor = n;
 }
 
-std::function<void(Entity&, Entity&)>
-BattleTable::get_fn(Entity& attacker, Entity& defender)
+Fn
+BattleTable::get_fn(Entity attacker, Entity defender)
 {
   return _fn_table[static_cast<int>(attacker.type())][static_cast<int>(
     defender.type())][static_cast<int>(attacker.state())]
@@ -495,7 +512,7 @@ BattleTable::get_fn(Entity& attacker, Entity& defender)
 }
 
 int
-BattleTable::get_dmg(Entity& attacker, Entity& defender)
+BattleTable::get_dmg(Entity attacker, Entity defender)
 {
   return _dmg_table[static_cast<int>(attacker.type())][static_cast<int>(
     defender.type())][static_cast<int>(attacker.state())]
@@ -556,15 +573,15 @@ BattleTable::get_wall_factor()
   return _wall_factor;
 }
 
-void
-BattleTable::battle(Entity& attacker, Entity& defender)
+std::pair<Entity, Entity>
+BattleTable::battle(Entity attacker, Entity defender)
 {
   if (attacker.type() == EntityType::Size ||
       defender.type() == EntityType::Size) {
-    return;
+    return std::make_pair(attacker, defender);
   }
 
-  _fn_table[static_cast<int>(attacker.type())][static_cast<int>(
+  return _fn_table[static_cast<int>(attacker.type())][static_cast<int>(
     defender.type())][static_cast<int>(attacker.state())]
-           [static_cast<int>(defender.state())](attacker, defender);
+                  [static_cast<int>(defender.state())](attacker, defender);
 }

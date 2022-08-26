@@ -80,8 +80,6 @@ EntityBehavior::soldier_behavior(EntityTable& table,
   std::mt19937 gen(rd());
 
   if (true) {
-    auto entity = table.get_entity(center);
-
     auto enemies = EntityBehavior::count_enemy(table, center, sight_radius, n);
 
     if (enemies != 0) {
@@ -139,7 +137,7 @@ EntityBehavior::random_move(EntityTable& table,
         }
       }
     }
-    
+
     if (advancing_moves.size() > 0) {
       return advancing_moves[gen() % advancing_moves.size()];
     } else {
@@ -148,7 +146,7 @@ EntityBehavior::random_move(EntityTable& table,
       return iter->first;
     }
   } else {
-    auto try_wall =  EntityBehavior::move_to_nearest_of_type(
+    auto try_wall = EntityBehavior::move_to_nearest_of_type(
       table, center, sight_radius, n, EntityType::Wall);
     return try_wall;
   }

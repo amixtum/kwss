@@ -45,21 +45,15 @@ GameManager::grid()
   return _entity_table;
 }
 
-void 
+void
 GameManager::setup()
 {
   Point2i left_leader_pos(0, _entity_table.get_dimensions().y / 2);
-  Point2i right_leader_pos(
-      _entity_table.get_dimensions().x - 1, 
-      _entity_table.get_dimensions().y / 2);
+  Point2i right_leader_pos(_entity_table.get_dimensions().x - 1,
+                           _entity_table.get_dimensions().y / 2);
 
-
-  _entity_table.put_entity(left_leader_pos, 
-                           EntityType::Leader, 
-                           Team::Left);
-  _entity_table.put_entity(right_leader_pos, 
-                           EntityType::Leader, 
-                           Team::Right);
+  _entity_table.put_entity(left_leader_pos, EntityType::Leader, Team::Left);
+  _entity_table.put_entity(right_leader_pos, EntityType::Leader, Team::Right);
 
   spawn_walls();
 }
@@ -67,7 +61,7 @@ GameManager::setup()
 void
 GameManager::spawn_units()
 {
- for (int i = 0; i < _battle_table.get_wave_size(); i += 1) {
+  for (int i = 0; i < _battle_table.get_wave_size(); i += 1) {
     spawn(EntityType::Soldier, Team::Left);
 
     spawn(EntityType::Soldier, Team::Right);
@@ -88,7 +82,9 @@ GameManager::spawn_units()
 void
 GameManager::spawn_walls()
 {
-  for (int _ = 0; _ < _entity_table.get_dimensions().y * _battle_table.get_wall_factor(); _ += 1) {
+  for (int _ = 0;
+       _ < _entity_table.get_dimensions().y * _battle_table.get_wall_factor();
+       _ += 1) {
     spawn(EntityType::Wall, Team::Size);
   }
 }
@@ -97,84 +93,115 @@ void
 GameManager::move_entities()
 {
   DebugLog logger;
-  for (int i = 0; i < (int)_ordering.size(); i += 1) {
-    auto entity = _ordering[i];
-    auto center = entity->position();
+
+  auto key_fn = [](Point2i p) { return p.x * p.y + p.x; };
+
+  std::vector<Node> random_traverse;
+  Tree::RandomTraverse(_ordering, random_traverse);
+
+  for (auto& node : random_traverse) {
+    auto entity = node->value();
+    auto center = entity.position();
     auto next_pos = center;
 
-    // compute stamina and AbilityState values
-    if (entity->state() == AbilityState::Off) {
-      if (entity->stamina() < 
-          _battle_table.get_max_stamina(entity->type())) {
-        entity->add_stamina(1);
-      }
-    } else if (entity->state() == AbilityState::On) {
-      entity->add_stamina(-1);
+    // we already deleted this entity when we battled it
+    // so just continue
+    if (!_entity_table.get_entity(center).alive()) {
+      continue;
+    }
 
-      if (!entity->has_stamina()) {
-        entity->set_ability_state(AbilityState::Off);
+    // compute stamina and AbilityState values
+    if (entity.state() == AbilityState::Off) {
+      if (entity.stamina() < _battle_table.get_max_stamina(entity.type())) {
+        auto c = _entity_table.get_entity(center);
+        c.add_stamina(1);
+        _entity_table.put_entity(center, c);
+      }
+    } else if (entity.state() == AbilityState::On) {
+      auto c = _entity_table.get_entity(center);
+      c.add_stamina(-1);
+      _entity_table.put_entity(center, c);
+
+      if (!entity.has_stamina()) {
+        auto c = _entity_table.get_entity(center);
+        c.set_ability_state(AbilityState::Off);
+        _entity_table.put_entity(center, c);
       }
     } else {
       logger.write("Moveable Entity does not have a state");
     }
-    
+
+    // may have updated entity in the table
+    entity = _entity_table.get_entity(entity.position());
+
     // compute next move
-    if (entity->type() == EntityType::Spy) {
+    if (entity.type() == EntityType::Spy) {
       next_pos = EntityBehavior::spy_behavior(
-          _entity_table,
-          center,
-          _battle_table.get_sight_radius(EntityType::Spy),
-          Neighborhood::Moore,
-          _battle_table.get_distance_threshold(EntityType::Spy)
-      );
-    } else if (entity->type() == EntityType::Soldier) {
+        _entity_table,
+        center,
+        _battle_table.get_sight_radius(EntityType::Spy),
+        Neighborhood::Moore,
+        _battle_table.get_distance_threshold(EntityType::Spy));
+    } else if (entity.type() == EntityType::Soldier) {
       next_pos = EntityBehavior::soldier_behavior(
-          _entity_table,
-          center,
-          _battle_table.get_sight_radius(EntityType::Soldier),
-          Neighborhood::Moore,
-          _battle_table.get_distance_threshold(EntityType::Soldier)
-      );
+        _entity_table,
+        center,
+        _battle_table.get_sight_radius(EntityType::Soldier),
+        Neighborhood::Moore,
+        _battle_table.get_distance_threshold(EntityType::Soldier));
     }
 
     // computed an activate ability/wait
     if (next_pos == center) {
-      if (entity->state() == AbilityState::Off &&
-          entity->has_stamina()) {
-        entity->set_ability_state(AbilityState::On);
+      if (entity.state() == AbilityState::Off && entity.has_stamina()) {
+        auto c = _entity_table.get_entity(center);
+        c.set_ability_state(AbilityState::On);
+        _entity_table.put_entity(center, c);
+        //_entity_table.get_entity(center)->set_ability_state(AbilityState::On);
       }
 
-    // attacking another entity
-    } else if (_entity_table.get_entity(next_pos).type() != 
-               EntityType::Size) {
-      if (_entity_table.get_entity(next_pos).team() == 
-          entity->team()) {
+      // attacking another entity
+    } else if (_entity_table.get_entity(next_pos).type() != EntityType::Size) {
+      // don't attack the same Team
+      if (_entity_table.get_entity(next_pos).team() == entity.team()) {
         continue;
       }
 
-      _battle_table.battle(
-          _entity_table.get_entity(entity->position()),
-          _entity_table.get_entity(next_pos)
-      );
+      // battle
+      _entity_table.battle(center, next_pos);
 
-      if (!_entity_table.get_entity(entity->position()).alive()) {
-        if (!entity->alive()) {
-          logger.write("Pointers working as planned");
+      auto attacker = _entity_table.get_entity(center);
+      auto defender = _entity_table.get_entity(next_pos);
+
+      // remove this Entity if it died in battle
+      if (!attacker.alive()) {
+        auto new_root_maybe = Tree::DeleteNode(_ordering, key_fn(center));
+        if (new_root_maybe->parent() == nullptr) {
+          _ordering = new_root_maybe;
         }
-
-        to_remove[i] = true;
-      } else if (!_entity_table.get_entity(next_pos).alive() &&
-                  _entity_table.get_entity(next_pos).type() != 
-                  EntityType::Wall) {
-        for (int k = 0; k < (int)_ordering.size(); k += 1) {
-          if (_ordering[k]->position() == next_pos) {
-            to_remove[k] = true;
-            break;
-          }
-        }       
+        _entity_table.put_entity(center, EntityType::Size, Team::Size);
       }
+
+      // remove other Entity if it died in battle
+      if (!defender.alive() && defender.type() != EntityType::Wall) {
+        auto new_root_maybe = Tree::DeleteNode(_ordering, key_fn(next_pos));
+        if (new_root_maybe->parent() == nullptr) {
+          _ordering = new_root_maybe;
+        }
+        _entity_table.put_entity(next_pos, EntityType::Size, Team::Size);
+      }
+
+      // move Entity to empty space
     } else {
-      _entity_table.move_entity(entity->position(), next_pos);
+      auto new_root_maybe = Tree::DeleteNode(_ordering, key_fn(center));
+      if (new_root_maybe->parent() == nullptr) {
+        _ordering = new_root_maybe;
+      }
+
+      _entity_table.move_entity(center, next_pos);
+
+      Tree::InsertNode(
+        _ordering, key_fn(next_pos), _entity_table.get_entity(next_pos));
     }
   }
 }
@@ -185,19 +212,22 @@ GameManager::spawn(EntityType type, Team team)
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  auto swp_last = [] (std::vector<Entity*>& e, int i) {
-    auto temp = e[e.size() - 1];
-    e[e.size() - 1] = e[i];
-    e[i] = temp;
-  };
+  auto key_fn = [](Point2i p) { return p.x * p.y + p.x; };
 
   auto spawned = _spawner.spawn(type, team, _battle_table.get_spawn_attempts());
 
   if (spawned.type() == type &&
       (type == EntityType::Spy || type == EntityType::Soldier)) {
+    if (_ordering == nullptr) {
+      _ordering = Tree::MakeNode(key_fn(spawned.position()), spawned);
+    } else {
+      Tree::InsertNode(_ordering, key_fn(spawned.position()), spawned);
+    }
   }
 
-  _entity_table.get_entity(spawned.position()).set_ability_state(AbilityState::Off);
+  auto e = _entity_table.get_entity(spawned.position());
+  e.set_ability_state(AbilityState::Off);
+  _entity_table.put_entity(spawned.position(), e);
 
   return spawned.type() == type;
 }

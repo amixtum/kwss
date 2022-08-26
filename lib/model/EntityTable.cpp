@@ -11,6 +11,8 @@ EntityTable::EntityTable(BattleTable* battle_table)
             battle_table->get_dimensions().y,
             Entity(EntityType::Size, Team::Size, 0, 0, Point2i(0, 0))))
   , _dimensions(battle_table->get_dimensions())
+  , left_leader(-1, -1)
+  , right_leader(-1, -1)
 {
   for (auto i = 0; i < _dimensions.x; i += 1) {
     for (auto k = 0; k < _dimensions.y; k += 1) {
@@ -19,12 +21,21 @@ EntityTable::EntityTable(BattleTable* battle_table)
   }
 }
 
+void
+EntityTable::battle(Point2i attacker, Point2i defender)
+{
+  auto new_entities =
+    _battle_table->battle(get_entity(attacker), get_entity(defender));
+  put_entity(attacker, new_entities.first);
+  put_entity(defender, new_entities.second);
+}
+
 Team
 EntityTable::get_winner()
 {
-  if (!left_leader->alive()) {
+  if (!get_entity(left_leader).alive()) {
     return Team::Right;
-  } else if (!right_leader->alive()) {
+  } else if (!get_entity(right_leader).alive()) {
     return Team::Left;
   }
 
@@ -41,11 +52,7 @@ Entity
 EntityTable::put_entity(Point2i pos, EntityType type, Team team)
 {
   if (type == EntityType::Size) {
-    _grid[pos.x][pos.y] = Entity(type,
-                                 team,
-                                 0,
-                                 0,
-                                 pos);
+    _grid[pos.x][pos.y] = Entity(type, team, 0, 0, pos);
     return _grid[pos.x][pos.y];
   }
   _grid[pos.x][pos.y] = Entity(type,
@@ -56,9 +63,9 @@ EntityTable::put_entity(Point2i pos, EntityType type, Team team)
 
   if (type == EntityType::Leader) {
     if (team == Team::Left) {
-      left_leader = &_grid[pos.x][pos.y];
+      left_leader = pos;
     } else if (team == Team::Right) {
-      right_leader = &_grid[pos.x][pos.y];
+      right_leader = pos;
     }
   }
 
@@ -66,16 +73,16 @@ EntityTable::put_entity(Point2i pos, EntityType type, Team team)
 }
 
 Entity
-EntityTable::put_entity(Point2i pos, Entity& entity)
+EntityTable::put_entity(Point2i pos, Entity entity)
 {
   _grid[pos.x][pos.y] = entity;
-  
+
   entity.set_position(pos);
 
   return _grid[pos.x][pos.y];
 }
 
-Entity&
+Entity
 EntityTable::get_entity(Point2i pos)
 {
   return _grid[pos.x][pos.y];

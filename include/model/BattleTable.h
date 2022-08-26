@@ -9,9 +9,10 @@
 #include "Entity.h"
 #include "EntityType.h"
 
+using Fn = std::function<std::pair<Entity, Entity>(Entity, Entity)>;
+
 using FnTable = std::array<
-  std::array<std::array<std::array<std::function<void(Entity&, Entity&)>,
-                                   static_cast<int>(AbilityState::Size)>,
+  std::array<std::array<std::array<Fn, static_cast<int>(AbilityState::Size)>,
                         static_cast<int>(AbilityState::Size)>,
              static_cast<int>(EntityType::Size)>,
   static_cast<int>(EntityType::Size)>;
@@ -39,7 +40,7 @@ public:
               EntityType defend_type,
               AbilityState attack_state,
               AbilityState defend_state,
-              std::function<void(Entity&, Entity&)> fn);
+              Fn fn);
 
   void set_dmg(EntityType attack_type,
                EntityType defend_type,
@@ -65,10 +66,9 @@ public:
 
   void set_wall_factor(float n);
 
-  std::function<void(Entity&, Entity&)> get_fn(Entity& attacker,
-                                               Entity& defender);
+  Fn get_fn(Entity attacker, Entity defender);
 
-  int get_dmg(Entity& attacker, Entity& defender);
+  int get_dmg(Entity attacker, Entity defender);
 
   int get_max_hp(EntityType entity);
 
@@ -88,7 +88,7 @@ public:
 
   float get_wall_factor();
 
-  void battle(Entity& attacker, Entity& defender);
+  std::pair<Entity, Entity> battle(Entity attacker, Entity defender);
 
 private:
   FnTable _fn_table;

@@ -30,17 +30,19 @@ public:
 public:
   EntityTable(BattleTable* battle_table);
 
+  void battle(Point2i attacker, Point2i defender);
+
   Team get_winner();
 
   Point2i get_dimensions();
 
   Entity put_entity(Point2i pos, EntityType type, Team team);
 
-  Entity put_entity(Point2i pos, Entity& entity);
+  Entity put_entity(Point2i pos, Entity entity);
 
   void move_entity(Point2i from, Point2i to);
 
-  Entity& get_entity(Point2i pos);
+  Entity get_entity(Point2i pos);
 
   bool has_entity(Point2i pos) const;
 
@@ -114,8 +116,8 @@ private:
 
   Point2i _dimensions;
 
-  Entity *left_leader;
-  Entity *right_leader;
+  Point2i left_leader;
+  Point2i right_leader;
 };
 
 #endif // EntityTable.h included

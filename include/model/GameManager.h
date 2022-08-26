@@ -22,7 +22,7 @@ public:
 
   Team winner();
 
-  EntityTable &grid();
+  EntityTable& grid();
 
 private:
   void setup();
@@ -41,6 +41,8 @@ private:
   EntityTable _entity_table;
 
   EntitySpawner _spawner;
+
+  Node _ordering = nullptr;
 };
 
 #endif // GameManager.h included

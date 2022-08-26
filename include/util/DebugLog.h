@@ -12,6 +12,7 @@ public:
   ~DebugLog();
 
   void write(const std::string& s);
+
 private:
   std::ofstream file;
   std::string filename = "/home/ganiparrott/src/projects/kwss/log/log.txt";
