@@ -60,14 +60,14 @@ TableRender::render(Window& window,
       bottom_right.y < 0 || bottom_right.x > table.get_dimensions().x ||
       bottom_right.y > table.get_dimensions().y ||
       top_left.x >= bottom_right.x || top_left.y >= bottom_right.y ||
-      (bottom_right.x - top_left.x) > window.size().x ||
-      (bottom_right.y - top_left.y) > window.size().y) {
+      (bottom_right.x - top_left.x) > window.size().x - 1 ||
+      (bottom_right.y - top_left.y) > window.size().y - 1) {
     std::cout << window.size().x << " " << window.size().y << "\n";
     return;
   }
 
-  int w_x = 0;
-  int w_y = 0;
+  int w_x = 1;
+  int w_y = 1;
   for (int x = top_left.x; x < bottom_right.x; x += 1) {
     for (int y = top_left.y; y < bottom_right.y; y += 1) {
       Point2i window_pos(w_x, w_y);
@@ -75,7 +75,7 @@ TableRender::render(Window& window,
       window.add_char_at_color(window_pos, sym.first, sym.second);
       w_y += 1;
     }
-    w_y = 0;
+    w_y = 1;
     w_x += 1;
   }
 

@@ -1,13 +1,13 @@
-Dimensions 128 16
+Dimensions 64 16
 #
-Respawn 2 1 1
+Respawn 8 1 4
 #
-WallFactor 8
+WallFactor 0
 #
 MaxValues
 # EntityType HP Stamina SightRadius ActivationThreshold
-Soldier 2 2 2 1.5
-Spy 1 10 3 2
+Soldier 2 3 3 1.5
+Spy 1 5 3 2
 Wall 1 0 0 0
 Leader 16 0 0 0
 #

@@ -67,11 +67,15 @@ main(int argc, char** argv)
     current_score.append(", ");
     current_score.append("Right HP: ");
     current_score.append(std::to_string(gm.grid().get_entity(gm.grid().get_leader(Team::Right)).hp()));
-    wmove(win.ptr(), (height / 2) + (height / 4), (width / 2) + (width / 4));
+    wmove(win.ptr(), height - 2, (width / 2) - (strlen(current_score.c_str()) / 2));
     waddstr(win.ptr(), current_score.c_str());
     win.refresh();
     current_score.clear();
   }
+
+    wmove(win.ptr(), height - 2, (width / 2) - (strlen(current_score.c_str()) / 2));
+    waddstr(win.ptr(), "");
+    win.refresh();
 
   std::string winner;
   if (gm.winner() == Team::Left) {
@@ -82,7 +86,7 @@ main(int argc, char** argv)
 
   winner.append(". Press q to quit");
 
-  wmove(win.ptr(), height / 2, width / 2);
+  wmove(win.ptr(), height - 2, width / 2 - (strlen(winner.c_str()) / 2));
   waddstr(win.ptr(), winner.c_str());
 
   win.refresh();
