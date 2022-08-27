@@ -9,7 +9,7 @@ TableRender::TableRender()
   char soldier = '%';
   char spy = '$';
   char leader = '@';
-  char wall = '|';
+  char wall = ' ';
 
   auto sol_left = std::make_pair(soldier, 1);
   auto sol_left_on = std::make_pair(soldier, 5);

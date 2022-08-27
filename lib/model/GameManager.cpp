@@ -259,6 +259,13 @@ GameManager::move_entities()
         continue;
       }
 
+      if (_entity_table.get_entity(next_pos).state() == AbilityState::On &&
+          !_entity_table.get_entity(next_pos).has_stamina()) {
+        auto e = _entity_table.get_entity(next_pos);
+        e.set_ability_state(AbilityState::Off);
+        _entity_table.put_entity(next_pos, e);
+      }
+
       // battle
       _entity_table.battle(center, next_pos);
 
@@ -267,6 +274,11 @@ GameManager::move_entities()
            _entity_table.get_entity(next_pos).state() == AbilityState::On)) {
         _entity_table.battle(next_pos, center);
       } 
+
+      auto e = _entity_table.get_entity(center);
+      e.set_ability_state(AbilityState::Off);
+      e.add_stamina(-1);
+      _entity_table.put_entity(center, e);
 
       auto attacker = _entity_table.get_entity(center);
       auto defender = _entity_table.get_entity(next_pos);

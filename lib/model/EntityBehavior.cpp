@@ -25,7 +25,7 @@ EntityBehavior::spy_behavior(EntityTable& table,
     auto nearest_distance =
       EntityBehavior::nearest_enemy_distance(table, center, sight_radius, n);
 
-    if (friendly <= enemies - 1) {
+    if (friendly < enemies - 1) {
       if (entity.state() == AbilityState::On) {
         if (nearest_distance <= distance_threshold) {
           return EntityBehavior::move_to_nearest_enemy(
@@ -36,16 +36,20 @@ EntityBehavior::spy_behavior(EntityTable& table,
         }
       }
 
-      if (nearest_distance <= distance_threshold) {
-        if (table.get_entity(center).has_stamina()) {
-          return center;
-        } else {
-          return EntityBehavior::runaway_from_nearest_enemy(
-            table, center, sight_radius, n);
-        }
+      if (gen() % 1000 < 800) {
+        return center;
       }
 
-      return EntityBehavior::runaway_move(table, center, sight_radius, n);
+      auto try_spy = EntityBehavior::move_to_nearest_of_type_enemy(
+        table, center, sight_radius, n, EntityType::Spy);
+
+      if (try_spy == center) {
+        return EntityBehavior::runaway_move(
+            table, center, sight_radius, n
+        );
+      }
+
+      return try_spy;
     } else {
       if (entity.state() == AbilityState::On) {
         return EntityBehavior::move_to_nearest_enemy(
@@ -85,6 +89,18 @@ EntityBehavior::soldier_behavior(EntityTable& table,
 
     if (friendly <= enemies - 1) {
       if (nearest_distance <= distance_threshold) {
+        if (table.get_entity(center).stamina() >= 2 && gen() % 1000 < 750) {
+          return center;
+        }
+
+        auto try_spy = EntityBehavior::move_to_nearest_of_type_enemy(
+            table, center, sight_radius, n, EntityType::Spy
+        );
+
+        if (try_spy != center) {
+          return try_spy;
+        }
+
         return EntityBehavior::move_to_nearest_enemy(
           table, center, sight_radius, n);
       }
